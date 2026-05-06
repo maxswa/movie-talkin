@@ -14,7 +14,7 @@ Routes are grouped by resource. Each section lists the endpoints, who can call t
 ## Progress
 
 - [x] 0. Seed script
-- [ ] 1. Auth middleware & session
+- [x] 1. Auth middleware & session
 - [ ] 2. Users
 - [ ] 3. Watch groups
 - [ ] 4. Watch parties — CRUD & status transitions

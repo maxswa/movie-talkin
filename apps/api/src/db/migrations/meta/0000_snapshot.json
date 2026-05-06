@@ -1,28 +1,56 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "f483a32c-bf82-4a3c-b438-234521895299",
+  "id": "751a4015-781a-4282-be4e-7c5844b07b59",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
-    "room_members": {
-      "name": "room_members",
+    "brackets": {
+      "name": "brackets",
       "columns": {
-        "room_id": {
-          "name": "room_id",
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "watch_party_id": {
+          "name": "watch_party_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "user_id": {
-          "name": "user_id",
+        "round": {
+          "name": "round",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "joined_at": {
-          "name": "joined_at",
+        "suggestion_a_id": {
+          "name": "suggestion_a_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "suggestion_b_id": {
+          "name": "suggestion_b_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "winner_id": {
+          "name": "winner_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -32,12 +60,25 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "room_members_room_id_rooms_id_fk": {
-          "name": "room_members_room_id_rooms_id_fk",
-          "tableFrom": "room_members",
-          "tableTo": "rooms",
+        "brackets_watch_party_id_watch_parties_id_fk": {
+          "name": "brackets_watch_party_id_watch_parties_id_fk",
+          "tableFrom": "brackets",
+          "tableTo": "watch_parties",
           "columnsFrom": [
-            "room_id"
+            "watch_party_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "brackets_suggestion_a_id_movie_suggestions_id_fk": {
+          "name": "brackets_suggestion_a_id_movie_suggestions_id_fk",
+          "tableFrom": "brackets",
+          "tableTo": "movie_suggestions",
+          "columnsFrom": [
+            "suggestion_a_id"
           ],
           "columnsTo": [
             "id"
@@ -45,12 +86,25 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "room_members_user_id_users_id_fk": {
-          "name": "room_members_user_id_users_id_fk",
-          "tableFrom": "room_members",
-          "tableTo": "users",
+        "brackets_suggestion_b_id_movie_suggestions_id_fk": {
+          "name": "brackets_suggestion_b_id_movie_suggestions_id_fk",
+          "tableFrom": "brackets",
+          "tableTo": "movie_suggestions",
           "columnsFrom": [
-            "user_id"
+            "suggestion_b_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "brackets_winner_id_movie_suggestions_id_fk": {
+          "name": "brackets_winner_id_movie_suggestions_id_fk",
+          "tableFrom": "brackets",
+          "tableTo": "movie_suggestions",
+          "columnsFrom": [
+            "winner_id"
           ],
           "columnsTo": [
             "id"
@@ -63,8 +117,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "rooms": {
-      "name": "rooms",
+    "category_suggestions": {
+      "name": "category_suggestions",
       "columns": {
         "id": {
           "name": "id",
@@ -73,9 +127,16 @@
           "notNull": true,
           "autoincrement": true
         },
-        "slug": {
-          "name": "slug",
-          "type": "text",
+        "watch_party_id": {
+          "name": "watch_party_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "suggested_by": {
+          "name": "suggested_by",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -83,13 +144,6 @@
         "name": {
           "name": "name",
           "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "host_id": {
-          "name": "host_id",
-          "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -103,22 +157,306 @@
           "default": "(current_timestamp)"
         }
       },
+      "indexes": {},
+      "foreignKeys": {
+        "category_suggestions_watch_party_id_watch_parties_id_fk": {
+          "name": "category_suggestions_watch_party_id_watch_parties_id_fk",
+          "tableFrom": "category_suggestions",
+          "tableTo": "watch_parties",
+          "columnsFrom": [
+            "watch_party_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "category_suggestions_suggested_by_users_id_fk": {
+          "name": "category_suggestions_suggested_by_users_id_fk",
+          "tableFrom": "category_suggestions",
+          "tableTo": "users",
+          "columnsFrom": [
+            "suggested_by"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "magic_link_tokens": {
+      "name": "magic_link_tokens",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "token": {
+          "name": "token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "used_at": {
+          "name": "used_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(current_timestamp)"
+        }
+      },
       "indexes": {
-        "rooms_slug_unique": {
-          "name": "rooms_slug_unique",
+        "magic_link_tokens_token_unique": {
+          "name": "magic_link_tokens_token_unique",
           "columns": [
-            "slug"
+            "token"
           ],
           "isUnique": true
         }
       },
       "foreignKeys": {
-        "rooms_host_id_users_id_fk": {
-          "name": "rooms_host_id_users_id_fk",
-          "tableFrom": "rooms",
+        "magic_link_tokens_user_id_users_id_fk": {
+          "name": "magic_link_tokens_user_id_users_id_fk",
+          "tableFrom": "magic_link_tokens",
           "tableTo": "users",
           "columnsFrom": [
-            "host_id"
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "movie_suggestions": {
+      "name": "movie_suggestions",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "watch_party_id": {
+          "name": "watch_party_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "suggested_by": {
+          "name": "suggested_by",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "tmdb_id": {
+          "name": "tmdb_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "poster_path": {
+          "name": "poster_path",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "overview": {
+          "name": "overview",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "release_year": {
+          "name": "release_year",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(current_timestamp)"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "movie_suggestions_watch_party_id_watch_parties_id_fk": {
+          "name": "movie_suggestions_watch_party_id_watch_parties_id_fk",
+          "tableFrom": "movie_suggestions",
+          "tableTo": "watch_parties",
+          "columnsFrom": [
+            "watch_party_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "movie_suggestions_suggested_by_users_id_fk": {
+          "name": "movie_suggestions_suggested_by_users_id_fk",
+          "tableFrom": "movie_suggestions",
+          "tableTo": "users",
+          "columnsFrom": [
+            "suggested_by"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "movie_votes": {
+      "name": "movie_votes",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "bracket_id": {
+          "name": "bracket_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "voted_for": {
+          "name": "voted_for",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(current_timestamp)"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(current_timestamp)"
+        }
+      },
+      "indexes": {
+        "movie_votes_bracket_id_user_id_unique": {
+          "name": "movie_votes_bracket_id_user_id_unique",
+          "columns": [
+            "bracket_id",
+            "user_id"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "movie_votes_bracket_id_brackets_id_fk": {
+          "name": "movie_votes_bracket_id_brackets_id_fk",
+          "tableFrom": "movie_votes",
+          "tableTo": "brackets",
+          "columnsFrom": [
+            "bracket_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "movie_votes_user_id_users_id_fk": {
+          "name": "movie_votes_user_id_users_id_fk",
+          "tableFrom": "movie_votes",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "movie_votes_voted_for_movie_suggestions_id_fk": {
+          "name": "movie_votes_voted_for_movie_suggestions_id_fk",
+          "tableFrom": "movie_votes",
+          "tableTo": "movie_suggestions",
+          "columnsFrom": [
+            "voted_for"
           ],
           "columnsTo": [
             "id"
@@ -152,7 +490,7 @@
           "name": "email",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         },
         "created_at": {
@@ -174,6 +512,189 @@
         }
       },
       "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "watch_group_members": {
+      "name": "watch_group_members",
+      "columns": {
+        "group_id": {
+          "name": "group_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "role": {
+          "name": "role",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'guest'"
+        },
+        "joined_at": {
+          "name": "joined_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(current_timestamp)"
+        }
+      },
+      "indexes": {
+        "watch_group_members_group_id_user_id_unique": {
+          "name": "watch_group_members_group_id_user_id_unique",
+          "columns": [
+            "group_id",
+            "user_id"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "watch_group_members_group_id_watch_groups_id_fk": {
+          "name": "watch_group_members_group_id_watch_groups_id_fk",
+          "tableFrom": "watch_group_members",
+          "tableTo": "watch_groups",
+          "columnsFrom": [
+            "group_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "watch_group_members_user_id_users_id_fk": {
+          "name": "watch_group_members_user_id_users_id_fk",
+          "tableFrom": "watch_group_members",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "watch_groups": {
+      "name": "watch_groups",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(current_timestamp)"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "watch_parties": {
+      "name": "watch_parties",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "watch_group_id": {
+          "name": "watch_group_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'draft'"
+        },
+        "scheduled_for": {
+          "name": "scheduled_for",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "selected_category": {
+          "name": "selected_category",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "winning_suggestion_id": {
+          "name": "winning_suggestion_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(current_timestamp)"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "watch_parties_watch_group_id_watch_groups_id_fk": {
+          "name": "watch_parties_watch_group_id_watch_groups_id_fk",
+          "tableFrom": "watch_parties",
+          "tableTo": "watch_groups",
+          "columnsFrom": [
+            "watch_group_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}

@@ -55,6 +55,7 @@ packages/
 | `pnpm --filter @movie-talkin/web dev` | Start the web dev server |
 | `pnpm --filter @movie-talkin/api db:generate` | Generate a new migration after editing `schema.ts` |
 | `pnpm --filter @movie-talkin/api db:migrate` | Apply pending migrations |
+| `pnpm --filter @movie-talkin/api db:seed` | Bootstrap first host user, group, and magic link |
 | `pnpm --filter @movie-talkin/shared build` | Build the shared package (required before typechecking apps) |
 | `pnpm typecheck` | Typecheck all packages |
 | `pnpm build` | Production build of all apps |

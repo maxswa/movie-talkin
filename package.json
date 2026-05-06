@@ -3,8 +3,14 @@
   "private": true,
   "scripts": {
     "dev": "pnpm --parallel --filter './apps/*' dev",
+    "dev:api": "pnpm --filter @movie-talkin/api dev",
+    "dev:web": "pnpm --filter @movie-talkin/web dev",
     "build": "pnpm --filter './packages/*' build && pnpm --filter './apps/*' build",
-    "typecheck": "pnpm -r typecheck"
+    "typecheck": "pnpm -r typecheck",
+    "db:generate": "pnpm --filter @movie-talkin/api db:generate",
+    "db:migrate": "pnpm --filter @movie-talkin/api db:migrate",
+    "db:seed": "pnpm --filter @movie-talkin/api db:seed",
+    "db:studio": "pnpm --filter @movie-talkin/api db:studio"
   },
   "devDependencies": {
     "typescript": "^5.8.3"

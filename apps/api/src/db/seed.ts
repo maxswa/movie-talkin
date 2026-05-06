@@ -1,7 +1,7 @@
-import { randomBytes } from "crypto";
-import { and, eq, isNull } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { db } from "./client.js";
-import { magicLinkTokens, users, watchGroupMembers, watchGroups } from "./schema.js";
+import { users, watchGroupMembers, watchGroups } from "./schema.js";
+import { generateMagicLink } from "../lib/magic-link.js";
 
 const HOST_NAME = process.env.SEED_HOST_NAME;
 const HOST_EMAIL = process.env.SEED_HOST_EMAIL;
@@ -46,16 +46,7 @@ await db
   .onConflictDoNothing();
 console.log(`Ensured "${user.name}" is a host of "${group.name}"`);
 
-// 4. Invalidate any existing unused tokens for this user
-await db
-  .delete(magicLinkTokens)
-  .where(and(eq(magicLinkTokens.userId, user.id), isNull(magicLinkTokens.usedAt)));
+// 4. Generate a magic link (invalidates any existing unused tokens)
+const magicLink = await generateMagicLink(user.id);
 
-// 5. Generate a new token (24h expiry)
-const token = randomBytes(32).toString("hex");
-const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
-await db.insert(magicLinkTokens).values({ userId: user.id, token, expiresAt });
-
-// 6. Print the magic link
-const magicLink = `${APP_URL}/auth/verify?token=${token}`;
 console.log(`\nMagic link for "${user.name}":\n\n  ${magicLink}\n\nExpires in 24 hours.`);

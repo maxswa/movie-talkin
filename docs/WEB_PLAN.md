@@ -22,7 +22,7 @@ Mobile-first React app built with TanStack Router and React Query. The UI is sta
 
 - [x] 1. Foundation
 - [x] 2. Home / party status view
-- [ ] 3. Category suggestions
+- [x] 3. Category suggestions
 - [ ] 4. Movie suggestions & search
 - [ ] 5. Brackets & voting
 - [ ] 6. Parties management (host)

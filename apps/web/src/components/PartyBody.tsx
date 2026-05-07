@@ -1,4 +1,5 @@
 import { tmdbImageUrl, type WatchPartyDetail } from "../lib/api";
+import { CategorySuggestions } from "./CategorySuggestions";
 
 export function PartyBody({ party }: { party: WatchPartyDetail }) {
   switch (party.status) {
@@ -10,11 +11,7 @@ export function PartyBody({ party }: { party: WatchPartyDetail }) {
       );
 
     case "open_for_category_suggestions":
-      return (
-        <p className="text-white/40 text-sm text-center py-8">
-          Category suggestions are open.
-        </p>
-      );
+      return <CategorySuggestions partyId={party.id} />;
 
     case "category_suggestions_closed":
       return (

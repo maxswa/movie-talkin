@@ -3,12 +3,14 @@ import { and, eq } from "drizzle-orm";
 import { db } from "../db/client.js";
 import {
   brackets,
+  categorySuggestions,
   movieSuggestions,
   users,
   watchGroupMembers,
   watchParties,
 } from "../db/schema.js";
 import {
+  CategorySuggestionSchema,
   ErrorSchema,
   MovieSuggestionSchema,
   WATCH_PARTY_STATUSES,
@@ -246,5 +248,92 @@ partiesRouter.openapi(
       .returning();
 
     return c.json({ ...updated, status: updated.status as WatchPartyStatus }, 200);
+  }
+);
+
+partiesRouter.openapi(
+  createRoute({
+    method: "get",
+    path: "/{partyId}/category-suggestions",
+    tags: ["Category Suggestions"],
+    summary: "List all category suggestions for the party",
+    middleware: [requireAuth],
+    request: { params: PartyIdParam },
+    responses: {
+      200: { content: { "application/json": { schema: z.array(CategorySuggestionSchema) } }, description: "Category suggestions" },
+      401: { content: { "application/json": { schema: ErrorSchema } }, description: "Not authenticated" },
+      403: { content: { "application/json": { schema: ErrorSchema } }, description: "Not a member" },
+      404: { content: { "application/json": { schema: ErrorSchema } }, description: "Party not found" },
+    },
+  }),
+  async (c) => {
+    const { partyId } = c.req.valid("param");
+    const user = c.get("user");
+
+    const { party, member } = await getPartyAndMembership(partyId, user.id);
+    if (!party) return c.json({ error: "Party not found" }, 404);
+    if (!member) return c.json({ error: "Forbidden" }, 403);
+
+    const suggestions = await db
+      .select({
+        id: categorySuggestions.id,
+        watchPartyId: categorySuggestions.watchPartyId,
+        suggestedBy: { id: users.id, name: users.name },
+        name: categorySuggestions.name,
+        createdAt: categorySuggestions.createdAt,
+      })
+      .from(categorySuggestions)
+      .innerJoin(users, eq(categorySuggestions.suggestedBy, users.id))
+      .where(eq(categorySuggestions.watchPartyId, partyId));
+
+    return c.json(suggestions, 200);
+  }
+);
+
+partiesRouter.openapi(
+  createRoute({
+    method: "post",
+    path: "/{partyId}/category-suggestions",
+    tags: ["Category Suggestions"],
+    summary: "Submit a category suggestion (only during open_for_category_suggestions)",
+    middleware: [requireAuth],
+    request: {
+      params: PartyIdParam,
+      body: {
+        content: {
+          "application/json": { schema: z.object({ name: z.string().min(1).max(100) }) },
+        },
+      },
+    },
+    responses: {
+      201: { content: { "application/json": { schema: CategorySuggestionSchema } }, description: "Suggestion created" },
+      400: { content: { "application/json": { schema: ErrorSchema } }, description: "Party not accepting category suggestions" },
+      401: { content: { "application/json": { schema: ErrorSchema } }, description: "Not authenticated" },
+      403: { content: { "application/json": { schema: ErrorSchema } }, description: "Not a member" },
+      404: { content: { "application/json": { schema: ErrorSchema } }, description: "Party not found" },
+    },
+  }),
+  async (c) => {
+    const { partyId } = c.req.valid("param");
+    const user = c.get("user");
+    const { name } = c.req.valid("json");
+
+    const { party, member } = await getPartyAndMembership(partyId, user.id);
+    if (!party) return c.json({ error: "Party not found" }, 404);
+    if (!member) return c.json({ error: "Forbidden" }, 403);
+
+    if (party.status !== "open_for_category_suggestions") {
+      return c.json({ error: "Party is not currently accepting category suggestions" }, 400);
+    }
+
+    const [inserted] = await db
+      .insert(categorySuggestions)
+      .values({ watchPartyId: partyId, suggestedBy: user.id, name })
+      .returning();
+
+    return c.json(
+      { ...inserted, suggestedBy: { id: user.id, name: user.name } },
+      201
+    );
   }
 );

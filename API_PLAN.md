@@ -18,7 +18,7 @@ Routes are grouped by resource. Each section lists the endpoints, who can call t
 - [x] 2. Users
 - [x] 3. Watch groups
 - [x] 4. Watch parties — CRUD & status transitions
-- [ ] 5. Category suggestions
+- [x] 5. Category suggestions
 - [ ] 6. TMDB search proxy
 - [ ] 7. Movie suggestions
 - [ ] 8. Brackets & voting

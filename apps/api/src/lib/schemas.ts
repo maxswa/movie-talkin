@@ -70,3 +70,13 @@ export const WatchPartyDetailSchema = WatchPartySchema.extend({
   members: z.array(GroupMemberSchema),
   winningSuggestion: MovieSuggestionSchema.nullable(),
 });
+
+export const SuggestedBySchema = z.object({ id: z.string(), name: z.string() });
+
+export const CategorySuggestionSchema = z.object({
+  id: z.string(),
+  watchPartyId: z.string(),
+  suggestedBy: SuggestedBySchema,
+  name: z.string(),
+  createdAt: z.string(),
+});

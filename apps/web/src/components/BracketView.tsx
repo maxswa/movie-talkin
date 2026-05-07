@@ -1,11 +1,24 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMe } from "../hooks/useMe";
 import { api } from "../lib/api";
 import { BracketRound } from "./BracketRound";
 
 export function BracketView({ partyId }: { partyId: string }) {
+  const { isHost } = useMe();
+  const queryClient = useQueryClient();
+
   const { data: rounds = [] } = useQuery({
     queryKey: ["brackets", partyId],
     queryFn: () => api.brackets.list(partyId),
+  });
+
+  const closeRoundMutation = useMutation({
+    mutationFn: () => api.brackets.closeRound(partyId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["brackets", partyId] });
+      queryClient.invalidateQueries({ queryKey: ["party", partyId] });
+      queryClient.invalidateQueries({ queryKey: ["activeParty"] });
+    },
   });
 
   if (rounds.length === 0) {
@@ -29,6 +42,20 @@ export function BracketView({ partyId }: { partyId: string }) {
           isCurrentRound={round === currentRound}
         />
       ))}
+
+      {isHost && (
+        <button
+          onClick={() => closeRoundMutation.mutate()}
+          disabled={closeRoundMutation.isPending}
+          className="rounded-xl bg-accent-purple px-4 py-3 text-sm font-medium disabled:opacity-40 transition-opacity"
+        >
+          {closeRoundMutation.isPending ? "Closing…" : "Close round & advance"}
+        </button>
+      )}
+
+      {closeRoundMutation.isError && (
+        <p className="text-xs text-red-400">{(closeRoundMutation.error as Error).message}</p>
+      )}
     </div>
   );
 }

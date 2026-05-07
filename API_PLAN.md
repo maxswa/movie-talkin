@@ -19,8 +19,8 @@ Routes are grouped by resource. Each section lists the endpoints, who can call t
 - [x] 3. Watch groups
 - [x] 4. Watch parties — CRUD & status transitions
 - [x] 5. Category suggestions
-- [ ] 6. TMDB search proxy
-- [ ] 7. Movie suggestions
+- [x] 6. TMDB search proxy
+- [x] 7. Movie suggestions
 - [ ] 8. Brackets & voting
 
 ---
@@ -77,10 +77,12 @@ Foundational — everything else depends on this. No DB routes yet, just wiring.
 
 | # | Method | Path | Auth | Notes |
 |---|--------|------|------|-------|
-| 3.1 | `POST` | `/groups` | self | Create a group. Creator is automatically added as `host`. |
-| 3.2 | `GET` | `/groups/:groupId` | member | Group details + member list with roles |
-| 3.3 | `POST` | `/groups/:groupId/members` | host | Add an existing user to the group. Body: `{ userId, role }` |
-| 3.4 | `DELETE` | `/groups/:groupId/members/:userId` | host | Remove a member. Cannot remove the last host. |
+| 3.1 | `GET` | `/groups` | self | List all groups the current user belongs to, with role |
+| 3.2 | `POST` | `/groups` | self | Create a group. Creator is automatically added as `host`. |
+| 3.3 | `GET` | `/groups/:groupId` | member | Group details + member list with roles |
+| 3.4 | `GET` | `/groups/:groupId/parties` | member | List all watch parties for the group |
+| 3.5 | `POST` | `/groups/:groupId/members` | host | Add an existing user to the group. Body: `{ userId, role }` |
+| 3.6 | `DELETE` | `/groups/:groupId/members/:userId` | host | Remove a member. Cannot remove the last host. |
 
 ---
 

@@ -122,9 +122,21 @@ partiesRouter.openapi(
 
     let winningSuggestion: z.infer<typeof MovieSuggestionSchema> | null = null;
     if (party.winningSuggestionId) {
-      const s = await db.query.movieSuggestions.findFirst({
-        where: eq(movieSuggestions.id, party.winningSuggestionId),
-      });
+      const [s] = await db
+        .select({
+          id: movieSuggestions.id,
+          watchPartyId: movieSuggestions.watchPartyId,
+          suggestedBy: { id: users.id, name: users.name },
+          tmdbId: movieSuggestions.tmdbId,
+          title: movieSuggestions.title,
+          posterPath: movieSuggestions.posterPath,
+          overview: movieSuggestions.overview,
+          releaseYear: movieSuggestions.releaseYear,
+          createdAt: movieSuggestions.createdAt,
+        })
+        .from(movieSuggestions)
+        .innerJoin(users, eq(movieSuggestions.suggestedBy, users.id))
+        .where(eq(movieSuggestions.id, party.winningSuggestionId));
       winningSuggestion = s ?? null;
     }
 
@@ -329,6 +341,120 @@ partiesRouter.openapi(
     const [inserted] = await db
       .insert(categorySuggestions)
       .values({ watchPartyId: partyId, suggestedBy: user.id, name })
+      .returning();
+
+    return c.json(
+      { ...inserted, suggestedBy: { id: user.id, name: user.name } },
+      201
+    );
+  }
+);
+
+partiesRouter.openapi(
+  createRoute({
+    method: "get",
+    path: "/{partyId}/movie-suggestions",
+    tags: ["Movie Suggestions"],
+    summary: "List all movie suggestions for the party",
+    middleware: [requireAuth],
+    request: { params: PartyIdParam },
+    responses: {
+      200: { content: { "application/json": { schema: z.array(MovieSuggestionSchema) } }, description: "Movie suggestions" },
+      401: { content: { "application/json": { schema: ErrorSchema } }, description: "Not authenticated" },
+      403: { content: { "application/json": { schema: ErrorSchema } }, description: "Not a member" },
+      404: { content: { "application/json": { schema: ErrorSchema } }, description: "Party not found" },
+    },
+  }),
+  async (c) => {
+    const { partyId } = c.req.valid("param");
+    const user = c.get("user");
+
+    const { party, member } = await getPartyAndMembership(partyId, user.id);
+    if (!party) return c.json({ error: "Party not found" }, 404);
+    if (!member) return c.json({ error: "Forbidden" }, 403);
+
+    const suggestions = await db
+      .select({
+        id: movieSuggestions.id,
+        watchPartyId: movieSuggestions.watchPartyId,
+        suggestedBy: { id: users.id, name: users.name },
+        tmdbId: movieSuggestions.tmdbId,
+        title: movieSuggestions.title,
+        posterPath: movieSuggestions.posterPath,
+        overview: movieSuggestions.overview,
+        releaseYear: movieSuggestions.releaseYear,
+        createdAt: movieSuggestions.createdAt,
+      })
+      .from(movieSuggestions)
+      .innerJoin(users, eq(movieSuggestions.suggestedBy, users.id))
+      .where(eq(movieSuggestions.watchPartyId, partyId));
+
+    return c.json(suggestions, 200);
+  }
+);
+
+partiesRouter.openapi(
+  createRoute({
+    method: "post",
+    path: "/{partyId}/movie-suggestions",
+    tags: ["Movie Suggestions"],
+    summary: "Submit a movie suggestion (only during open_for_movie_suggestions)",
+    middleware: [requireAuth],
+    request: {
+      params: PartyIdParam,
+      body: {
+        content: {
+          "application/json": { schema: z.object({ tmdbId: z.number().int().positive() }) },
+        },
+      },
+    },
+    responses: {
+      201: { content: { "application/json": { schema: MovieSuggestionSchema } }, description: "Suggestion created" },
+      400: { content: { "application/json": { schema: ErrorSchema } }, description: "Party not accepting movie suggestions" },
+      401: { content: { "application/json": { schema: ErrorSchema } }, description: "Not authenticated" },
+      403: { content: { "application/json": { schema: ErrorSchema } }, description: "Not a member" },
+      404: { content: { "application/json": { schema: ErrorSchema } }, description: "Party or movie not found" },
+      502: { content: { "application/json": { schema: ErrorSchema } }, description: "TMDB request failed" },
+    },
+  }),
+  async (c) => {
+    const { partyId } = c.req.valid("param");
+    const user = c.get("user");
+    const { tmdbId } = c.req.valid("json");
+
+    const { party, member } = await getPartyAndMembership(partyId, user.id);
+    if (!party) return c.json({ error: "Party not found" }, 404);
+    if (!member) return c.json({ error: "Forbidden" }, 403);
+
+    if (party.status !== "open_for_movie_suggestions") {
+      return c.json({ error: "Party is not currently accepting movie suggestions" }, 400);
+    }
+
+    const tmdbRes = await fetch(
+      `https://api.themoviedb.org/3/movie/${tmdbId}?api_key=${process.env.TMDB_API_KEY}`
+    );
+    if (tmdbRes.status === 404) return c.json({ error: "Movie not found on TMDB" }, 404);
+    if (!tmdbRes.ok) return c.json({ error: "TMDB request failed" }, 502);
+
+    const movie = (await tmdbRes.json()) as {
+      id: number;
+      title: string;
+      poster_path: string | null;
+      overview: string;
+      release_date: string;
+    };
+
+    const [inserted] = await db
+      .insert(movieSuggestions)
+      .values({
+        watchPartyId: partyId,
+        suggestedBy: user.id,
+        tmdbId: movie.id,
+        title: movie.title,
+        posterPath: movie.poster_path ?? null,
+        overview: movie.overview || null,
+        releaseYear: movie.release_date ? new Date(movie.release_date).getFullYear() : null,
+      })
       .returning();
 
     return c.json(

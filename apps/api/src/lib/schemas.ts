@@ -54,10 +54,12 @@ export const WatchPartySchema = z.object({
   createdAt: z.string(),
 });
 
+export const SuggestedBySchema = z.object({ id: z.string(), name: z.string() });
+
 export const MovieSuggestionSchema = z.object({
   id: z.string(),
   watchPartyId: z.string(),
-  suggestedBy: z.string(),
+  suggestedBy: SuggestedBySchema,
   tmdbId: z.number(),
   title: z.string(),
   posterPath: z.string().nullable(),
@@ -70,8 +72,6 @@ export const WatchPartyDetailSchema = WatchPartySchema.extend({
   members: z.array(GroupMemberSchema),
   winningSuggestion: MovieSuggestionSchema.nullable(),
 });
-
-export const SuggestedBySchema = z.object({ id: z.string(), name: z.string() });
 
 export const CategorySuggestionSchema = z.object({
   id: z.string(),

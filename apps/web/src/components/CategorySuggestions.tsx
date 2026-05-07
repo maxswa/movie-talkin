@@ -46,6 +46,8 @@ export function CategorySuggestions({ partyId }: { partyId: string }) {
     setInput("");
   }
 
+  const hasUserSuggested = suggestions.some((s) => s.suggestedBy.id === user?.id);
+
   return (
     <div className="flex flex-col gap-4">
       <ul className="flex flex-col gap-2">
@@ -57,7 +59,11 @@ export function CategorySuggestions({ partyId }: { partyId: string }) {
         {suggestions.map((s) => (
           <li
             key={s.id}
-            className="flex items-center justify-between rounded-xl bg-white/5 px-4 py-3"
+            className={`flex items-center justify-between rounded-xl px-4 py-3 ${
+              s.suggestedBy.id === user?.id
+                ? "bg-accent-purple/10 ring-1 ring-accent-purple/30"
+                : "bg-white/5"
+            }`}
           >
             <span className="text-sm font-medium">{s.name}</span>
             <span className="text-xs text-white/40">{s.suggestedBy.name}</span>
@@ -65,21 +71,23 @@ export function CategorySuggestions({ partyId }: { partyId: string }) {
         ))}
       </ul>
 
-      <form onSubmit={handleSubmit} className="flex gap-2">
-        <input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Suggest a category…"
-          className="flex-1 rounded-xl bg-white/10 px-4 py-3 text-sm placeholder:text-white/30 outline-none focus:ring-2 focus:ring-accent-purple/50"
-        />
-        <button
-          type="submit"
-          disabled={!input.trim() || mutation.isPending}
-          className="rounded-xl bg-accent-purple px-4 py-3 text-sm font-medium disabled:opacity-40 transition-opacity"
-        >
-          Add
-        </button>
-      </form>
+      {!hasUserSuggested && (
+        <form onSubmit={handleSubmit} className="flex gap-2">
+          <input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Suggest a category…"
+            className="flex-1 rounded-xl bg-white/10 px-4 py-3 text-sm placeholder:text-white/30 outline-none focus:ring-2 focus:ring-accent-purple/50"
+          />
+          <button
+            type="submit"
+            disabled={!input.trim() || mutation.isPending}
+            className="rounded-xl bg-accent-purple px-4 py-3 text-sm font-medium disabled:opacity-40 transition-opacity"
+          >
+            Add
+          </button>
+        </form>
+      )}
     </div>
   );
 }

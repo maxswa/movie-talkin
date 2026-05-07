@@ -316,6 +316,10 @@ partiesRouter.openapi(
       return c.json({ error: "Party is not currently accepting category suggestions" }, 400);
     }
 
+    await db
+      .delete(categorySuggestions)
+      .where(and(eq(categorySuggestions.watchPartyId, partyId), eq(categorySuggestions.suggestedBy, user.id)));
+
     const [inserted] = await db
       .insert(categorySuggestions)
       .values({ watchPartyId: partyId, suggestedBy: user.id, name })
@@ -407,6 +411,10 @@ partiesRouter.openapi(
     if (party.status !== "open_for_movie_suggestions") {
       return c.json({ error: "Party is not currently accepting movie suggestions" }, 400);
     }
+
+    await db
+      .delete(movieSuggestions)
+      .where(and(eq(movieSuggestions.watchPartyId, partyId), eq(movieSuggestions.suggestedBy, user.id)));
 
     const tmdbRes = await fetch(
       `https://api.themoviedb.org/3/movie/${tmdbId}?api_key=${process.env.TMDB_API_KEY}`

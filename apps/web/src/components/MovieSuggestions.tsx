@@ -27,6 +27,7 @@ export function MovieSuggestions({ partyId }: { partyId: string }) {
             key={s.id}
             suggestion={s}
             isOwn={s.suggestedBy.id === user?.id}
+            partyId={s.suggestedBy.id === user?.id ? partyId : undefined}
           />
         ))}
       </ul>

@@ -1,11 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
+import { usePartySocket } from "../hooks/usePartySocket";
 import { useMe } from "../hooks/useMe";
 import { api } from "../lib/api";
 import { MovieSuggestionItem } from "./MovieSuggestionItem";
 
 export function MovieSuggestions({ partyId }: { partyId: string }) {
   const { user } = useMe();
+  usePartySocket(partyId);
 
   const { data: suggestions = [] } = useQuery({
     queryKey: ["movie-suggestions", partyId],

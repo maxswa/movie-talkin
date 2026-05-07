@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { usePartySocket } from "../hooks/usePartySocket";
 import { useMe } from "../hooks/useMe";
 import { api, type CategorySuggestion } from "../lib/api";
 
@@ -34,6 +35,7 @@ function SuggestionRow({
 export function CategorySuggestions({ partyId }: { partyId: string }) {
   const { user } = useMe();
   const queryClient = useQueryClient();
+  usePartySocket(partyId);
   const [input, setInput] = useState("");
   const [editing, setEditing] = useState(false);
 

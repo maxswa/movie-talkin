@@ -1,8 +1,10 @@
-import { serve } from "@hono/node-server";
+import { serve, upgradeWebSocket } from "@hono/node-server";
 import { swaggerUI } from "@hono/swagger-ui";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
+import { WebSocketServer } from "ws";
+import { subscribe } from "./lib/pubsub.js";
 import { authRouter } from "./routes/auth.js";
 import { bracketsRouter } from "./routes/brackets.js";
 import { groupsRouter } from "./routes/groups.js";
@@ -23,6 +25,25 @@ app.onError((err, c) => {
 
 app.get("/health", (c) => c.json({ ok: true }));
 
+app.get(
+  "/ws/parties/:partyId",
+  upgradeWebSocket((c) => {
+    const partyId = c.req.param("partyId");
+    let unsubscribe: (() => void) | null = null;
+
+    return {
+      onOpen(_event, ws) {
+        unsubscribe = subscribe(partyId, (event) => {
+          ws.send(JSON.stringify(event));
+        });
+      },
+      onClose() {
+        unsubscribe?.();
+      },
+    };
+  }),
+);
+
 app.route("/auth", authRouter);
 app.route("/users", usersRouter);
 app.route("/groups", groupsRouter);
@@ -37,8 +58,9 @@ app.doc("/doc", {
 app.get("/ui", swaggerUI({ url: "/doc" }));
 
 const port = Number(process.env.PORT ?? 3000);
+const wss = new WebSocketServer({ noServer: true });
 
-serve({ fetch: app.fetch, port }, () => {
+serve({ fetch: app.fetch, port, websocket: { server: wss } }, () => {
   console.log(`API running on http://localhost:${port}`);
   console.log(`Swagger UI at http://localhost:${port}/ui`);
 });

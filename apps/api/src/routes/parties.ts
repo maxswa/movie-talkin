@@ -26,6 +26,7 @@ import {
   type WinnerInfo,
 } from "../lib/brackets.js";
 import { requireAuth } from "../middleware/auth.js";
+import { broadcast } from "../lib/pubsub.js";
 import type { AppEnv } from "../lib/types.js";
 
 const PartyIdParam = z.object({ partyId: z.string() });
@@ -445,6 +446,8 @@ partiesRouter.openapi(
       .values({ watchPartyId: partyId, suggestedBy: user.id, name })
       .returning();
 
+    broadcast(partyId, { type: "category_suggestion" });
+
     return c.json(
       { ...inserted, suggestedBy: { id: user.id, name: user.name } },
       201,
@@ -608,6 +611,8 @@ partiesRouter.openapi(
           : null,
       })
       .returning();
+
+    broadcast(partyId, { type: "movie_suggestion" });
 
     return c.json(
       { ...inserted, suggestedBy: { id: user.id, name: user.name } },

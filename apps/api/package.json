@@ -24,10 +24,12 @@
     "@movie-talkin/shared": "workspace:*",
     "drizzle-orm": "^0.43.1",
     "hono": "^4.7.10",
+    "ws": "^8.20.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/node": "^22.15.14",
+    "@types/ws": "^8.18.1",
     "drizzle-kit": "^0.31.1",
     "tsx": "^4.19.4",
     "typescript": "^5.8.3",

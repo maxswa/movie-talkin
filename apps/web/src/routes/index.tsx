@@ -20,7 +20,8 @@ function Home() {
   const activeParty =
     parties
       ?.filter((p) => p.status !== "watched")
-      .sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0] ?? null;
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+      .at(-1) ?? null;
 
   const { data: partyDetail, isLoading: detailLoading } = useQuery({
     queryKey: ["party", activeParty?.id],
@@ -28,7 +29,8 @@ function Home() {
     enabled: !!activeParty,
   });
 
-  const isLoading = meLoading || partiesLoading || (!!activeParty && detailLoading);
+  const isLoading =
+    meLoading || partiesLoading || (!!activeParty && detailLoading);
 
   if (isLoading) {
     return (
@@ -58,7 +60,9 @@ function Home() {
         <div className="flex flex-col items-center gap-3 py-20 text-center">
           <p className="text-5xl">🎬</p>
           <p className="font-semibold text-white/80">No upcoming party yet</p>
-          <p className="text-white/40 text-sm">Your host will set one up soon.</p>
+          <p className="text-white/40 text-sm">
+            Your host will set one up soon.
+          </p>
         </div>
       ) : (
         <PartyCard party={partyDetail} />

@@ -1,4 +1,5 @@
 import { tmdbImageUrl, type WatchPartyDetail } from "../lib/api";
+import { BracketView } from "./BracketView";
 import { CategorySuggestions } from "./CategorySuggestions";
 import { MovieSuggestions } from "./MovieSuggestions";
 
@@ -36,11 +37,7 @@ export function PartyBody({ party }: { party: WatchPartyDetail }) {
       );
 
     case "voting":
-      return (
-        <p className="text-white/40 text-sm text-center py-8">
-          Voting is open!
-        </p>
-      );
+      return <BracketView partyId={party.id} />;
 
     case "movie_selected": {
       const movie = party.winningSuggestion;

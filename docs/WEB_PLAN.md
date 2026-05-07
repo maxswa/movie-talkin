@@ -20,7 +20,7 @@ Mobile-first React app built with TanStack Router and React Query. The UI is sta
 
 ## Progress
 
-- [ ] 1. Foundation
+- [x] 1. Foundation
 - [ ] 2. Home / party status view
 - [ ] 3. Category suggestions
 - [ ] 4. Movie suggestions & search

@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as UsersRouteImport } from './routes/users'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as PartiesRouteImport } from './routes/parties'
 import { Route as IndexRouteImport } from './routes/index'
@@ -16,6 +17,11 @@ import { Route as PartiesIndexRouteImport } from './routes/parties.index'
 import { Route as PartiesPartyIdRouteImport } from './routes/parties.$partyId'
 import { Route as AuthVerifyRouteImport } from './routes/auth.verify'
 
+const UsersRoute = UsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
@@ -51,6 +57,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/parties': typeof PartiesRouteWithChildren
   '/search': typeof SearchRoute
+  '/users': typeof UsersRoute
   '/auth/verify': typeof AuthVerifyRoute
   '/parties/$partyId': typeof PartiesPartyIdRoute
   '/parties/': typeof PartiesIndexRoute
@@ -58,6 +65,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/search': typeof SearchRoute
+  '/users': typeof UsersRoute
   '/auth/verify': typeof AuthVerifyRoute
   '/parties/$partyId': typeof PartiesPartyIdRoute
   '/parties': typeof PartiesIndexRoute
@@ -67,6 +75,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/parties': typeof PartiesRouteWithChildren
   '/search': typeof SearchRoute
+  '/users': typeof UsersRoute
   '/auth/verify': typeof AuthVerifyRoute
   '/parties/$partyId': typeof PartiesPartyIdRoute
   '/parties/': typeof PartiesIndexRoute
@@ -77,16 +86,24 @@ export interface FileRouteTypes {
     | '/'
     | '/parties'
     | '/search'
+    | '/users'
     | '/auth/verify'
     | '/parties/$partyId'
     | '/parties/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/search' | '/auth/verify' | '/parties/$partyId' | '/parties'
+  to:
+    | '/'
+    | '/search'
+    | '/users'
+    | '/auth/verify'
+    | '/parties/$partyId'
+    | '/parties'
   id:
     | '__root__'
     | '/'
     | '/parties'
     | '/search'
+    | '/users'
     | '/auth/verify'
     | '/parties/$partyId'
     | '/parties/'
@@ -96,11 +113,19 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   PartiesRoute: typeof PartiesRouteWithChildren
   SearchRoute: typeof SearchRoute
+  UsersRoute: typeof UsersRoute
   AuthVerifyRoute: typeof AuthVerifyRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/users': {
+      id: '/users'
+      path: '/users'
+      fullPath: '/users'
+      preLoaderRoute: typeof UsersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/search': {
       id: '/search'
       path: '/search'
@@ -163,6 +188,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   PartiesRoute: PartiesRouteWithChildren,
   SearchRoute: SearchRoute,
+  UsersRoute: UsersRoute,
   AuthVerifyRoute: AuthVerifyRoute,
 }
 export const routeTree = rootRouteImport

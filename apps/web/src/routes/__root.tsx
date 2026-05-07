@@ -12,19 +12,21 @@ function Root() {
   const isVerifyRoute = pathname.startsWith("/auth/verify");
 
   return (
-    <div className="flex flex-col h-dvh max-w-md mx-auto bg-deep text-white">
-      <main className={`flex-1 overflow-y-auto ${isHost ? "pb-20" : "pb-4"}`}>
-        {!isLoading && !isAuthenticated && !isVerifyRoute ? (
-          <div className="flex flex-col items-center justify-center h-full gap-4 px-8 text-center">
-            <p className="text-4xl">🎬</p>
-            <h1 className="text-xl font-semibold">movie-talkin</h1>
-            <p className="text-white/50 text-sm">Open your magic link to sign in.</p>
-          </div>
-        ) : (
-          <Outlet />
-        )}
-      </main>
-      {isAuthenticated && isHost && <BottomNav />}
+    <div className="min-h-dvh bg-deep text-white">
+      <div className="flex flex-col h-dvh max-w-md mx-auto">
+        <main className={`flex-1 overflow-y-auto ${isHost ? "pb-20" : "pb-4"}`}>
+          {!isLoading && !isAuthenticated && !isVerifyRoute ? (
+            <div className="flex flex-col items-center justify-center h-full gap-4 px-8 text-center">
+              <p className="text-4xl">🎬</p>
+              <h1 className="text-xl font-semibold">movie-talkin</h1>
+              <p className="text-white/50 text-sm">Open your magic link to sign in.</p>
+            </div>
+          ) : (
+            <Outlet />
+          )}
+        </main>
+        {isAuthenticated && isHost && <BottomNav />}
+      </div>
     </div>
   );
 }

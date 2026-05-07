@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { api } from "../lib/api";
@@ -11,6 +12,7 @@ export const Route = createFileRoute("/auth/verify")({
 
 function VerifyPage() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { token } = Route.useSearch();
   const [error, setError] = useState<string | null>(null);
 
@@ -21,9 +23,13 @@ function VerifyPage() {
     }
     api.auth
       .verify(token)
-      .then(() => navigate({ to: "/" }))
+      .then(() => {
+        queryClient.resetQueries({ queryKey: ["me"] });
+        queryClient.resetQueries({ queryKey: ["groups"] });
+        navigate({ to: "/" });
+      })
       .catch((e: Error) => setError(e.message));
-  }, [token, navigate]);
+  }, [token, navigate, queryClient]);
 
   if (error) {
     return (

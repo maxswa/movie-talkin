@@ -5,7 +5,7 @@ import { magicLinkTokens } from "../db/schema.js";
 
 const APP_URL = process.env.APP_URL ?? "http://localhost:5173";
 
-export async function generateMagicLink(userId: number): Promise<string> {
+export async function generateMagicLink(userId: string): Promise<string> {
   await db
     .delete(magicLinkTokens)
     .where(and(eq(magicLinkTokens.userId, userId), isNull(magicLinkTokens.usedAt)));

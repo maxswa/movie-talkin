@@ -2,13 +2,12 @@ import { createHmac, timingSafeEqual } from "crypto";
 
 const SECRET = process.env.SESSION_SECRET ?? "dev-secret-change-me";
 
-export function signUserId(userId: number): string {
-  const payload = String(userId);
-  const sig = createHmac("sha256", SECRET).update(payload).digest("hex");
-  return `${payload}.${sig}`;
+export function signUserId(userId: string): string {
+  const sig = createHmac("sha256", SECRET).update(userId).digest("hex");
+  return `${userId}.${sig}`;
 }
 
-export function verifySessionCookie(value: string): number | null {
+export function verifySessionCookie(value: string): string | null {
   const dot = value.lastIndexOf(".");
   if (dot === -1) return null;
 
@@ -22,6 +21,5 @@ export function verifySessionCookie(value: string): number | null {
     return null;
   }
 
-  const userId = Number(payload);
-  return Number.isNaN(userId) ? null : userId;
+  return payload || null;
 }

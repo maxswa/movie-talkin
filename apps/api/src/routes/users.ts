@@ -16,7 +16,7 @@ const MagicLinkResponseSchema = z.object({ magicLink: z.string() });
 
 const UserWithMagicLinkSchema = UserSchema.extend({ magicLink: z.string() });
 
-async function requireAnyHost(userId: number) {
+async function requireAnyHost(userId: string) {
   return db.query.watchGroupMembers.findFirst({
     where: and(
       eq(watchGroupMembers.userId, userId),
@@ -80,7 +80,7 @@ usersRouter.openapi(
     tags: ["Users"],
     summary: "Generate a fresh magic link for a user (host only)",
     middleware: [requireAuth],
-    request: { params: z.object({ id: z.coerce.number() }) },
+    request: { params: z.object({ id: z.string() }) },
     responses: {
       200: { content: { "application/json": { schema: MagicLinkResponseSchema } }, description: "Magic link generated" },
       401: { content: { "application/json": { schema: ErrorSchema } }, description: "Not authenticated" },

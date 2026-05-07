@@ -1,122 +1,119 @@
-import { int, sqliteTable, text, unique } from "drizzle-orm/sqlite-core";
-import { sql } from "drizzle-orm";
+import { randomUUID } from "crypto";
+import { sqliteTable, text, integer, unique } from "drizzle-orm/sqlite-core";
+
+const uuid = () => text("id").primaryKey().$defaultFn(() => randomUUID());
+const now = () => text().$defaultFn(() => new Date().toISOString());
 
 export const users = sqliteTable("users", {
-  id: int("id").primaryKey({ autoIncrement: true }),
+  id: uuid(),
   name: text("name").notNull(),
   email: text("email").unique(),
-  createdAt: text("created_at").notNull().default(sql`(current_timestamp)`),
+  createdAt: now().notNull(),
 });
 
 export const magicLinkTokens = sqliteTable("magic_link_tokens", {
-  id: int("id").primaryKey({ autoIncrement: true }),
-  userId: int("user_id")
+  id: uuid(),
+  userId: text("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
   token: text("token").notNull().unique(),
   expiresAt: text("expires_at").notNull(),
   usedAt: text("used_at"),
-  createdAt: text("created_at").notNull().default(sql`(current_timestamp)`),
+  createdAt: now().notNull(),
 });
 
 export const watchGroups = sqliteTable("watch_groups", {
-  id: int("id").primaryKey({ autoIncrement: true }),
+  id: uuid(),
   name: text("name").notNull(),
-  createdAt: text("created_at").notNull().default(sql`(current_timestamp)`),
+  createdAt: now().notNull(),
 });
 
 export const watchGroupMembers = sqliteTable(
   "watch_group_members",
   {
-    groupId: int("group_id")
+    groupId: text("group_id")
       .notNull()
       .references(() => watchGroups.id, { onDelete: "cascade" }),
-    userId: int("user_id")
+    userId: text("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    // host | guest
     role: text("role").notNull().default("guest"),
-    joinedAt: text("joined_at").notNull().default(sql`(current_timestamp)`),
+    joinedAt: now().notNull(),
   },
   (t) => [unique().on(t.groupId, t.userId)]
 );
 
 export const watchParties = sqliteTable("watch_parties", {
-  id: int("id").primaryKey({ autoIncrement: true }),
-  watchGroupId: int("watch_group_id")
+  id: uuid(),
+  watchGroupId: text("watch_group_id")
     .notNull()
     .references(() => watchGroups.id, { onDelete: "cascade" }),
-  // draft | open_for_category_suggestions | category_suggestions_closed |
-  // open_for_movie_suggestions | movie_suggestions_closed | voting |
-  // movie_selected | watched
   status: text("status").notNull().default("draft"),
   scheduledFor: text("scheduled_for"),
   selectedCategory: text("selected_category"),
-  // set when bracket voting concludes — references movie_suggestions
-  winningSuggestionId: int("winning_suggestion_id"),
-  createdAt: text("created_at").notNull().default(sql`(current_timestamp)`),
+  winningSuggestionId: text("winning_suggestion_id"),
+  createdAt: now().notNull(),
 });
 
 export const categorySuggestions = sqliteTable("category_suggestions", {
-  id: int("id").primaryKey({ autoIncrement: true }),
-  watchPartyId: int("watch_party_id")
+  id: uuid(),
+  watchPartyId: text("watch_party_id")
     .notNull()
     .references(() => watchParties.id, { onDelete: "cascade" }),
-  suggestedBy: int("suggested_by")
+  suggestedBy: text("suggested_by")
     .notNull()
     .references(() => users.id),
   name: text("name").notNull(),
-  createdAt: text("created_at").notNull().default(sql`(current_timestamp)`),
+  createdAt: now().notNull(),
 });
 
 export const movieSuggestions = sqliteTable("movie_suggestions", {
-  id: int("id").primaryKey({ autoIncrement: true }),
-  watchPartyId: int("watch_party_id")
+  id: uuid(),
+  watchPartyId: text("watch_party_id")
     .notNull()
     .references(() => watchParties.id, { onDelete: "cascade" }),
-  suggestedBy: int("suggested_by")
+  suggestedBy: text("suggested_by")
     .notNull()
     .references(() => users.id),
-  tmdbId: int("tmdb_id").notNull(),
+  tmdbId: integer("tmdb_id").notNull(),
   title: text("title").notNull(),
   posterPath: text("poster_path"),
   overview: text("overview"),
-  releaseYear: int("release_year"),
-  createdAt: text("created_at").notNull().default(sql`(current_timestamp)`),
+  releaseYear: integer("release_year"),
+  createdAt: now().notNull(),
 });
 
 export const brackets = sqliteTable("brackets", {
-  id: int("id").primaryKey({ autoIncrement: true }),
-  watchPartyId: int("watch_party_id")
+  id: uuid(),
+  watchPartyId: text("watch_party_id")
     .notNull()
     .references(() => watchParties.id, { onDelete: "cascade" }),
-  round: int("round").notNull(),
-  suggestionAId: int("suggestion_a_id")
+  round: integer("round").notNull(),
+  suggestionAId: text("suggestion_a_id")
     .notNull()
     .references(() => movieSuggestions.id),
-  suggestionBId: int("suggestion_b_id")
+  suggestionBId: text("suggestion_b_id")
     .notNull()
     .references(() => movieSuggestions.id),
-  // null until the round closes
-  winnerId: int("winner_id").references(() => movieSuggestions.id),
-  createdAt: text("created_at").notNull().default(sql`(current_timestamp)`),
+  winnerId: text("winner_id").references(() => movieSuggestions.id),
+  createdAt: now().notNull(),
 });
 
 export const movieVotes = sqliteTable(
   "movie_votes",
   {
-    id: int("id").primaryKey({ autoIncrement: true }),
-    bracketId: int("bracket_id")
+    id: uuid(),
+    bracketId: text("bracket_id")
       .notNull()
       .references(() => brackets.id, { onDelete: "cascade" }),
-    userId: int("user_id")
+    userId: text("user_id")
       .notNull()
       .references(() => users.id),
-    votedFor: int("voted_for")
+    votedFor: text("voted_for")
       .notNull()
       .references(() => movieSuggestions.id),
-    createdAt: text("created_at").notNull().default(sql`(current_timestamp)`),
-    updatedAt: text("updated_at").notNull().default(sql`(current_timestamp)`),
+    createdAt: now().notNull(),
+    updatedAt: now().notNull(),
   },
   (t) => [unique().on(t.bracketId, t.userId)]
 );

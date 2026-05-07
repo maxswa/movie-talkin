@@ -4,6 +4,7 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { authRouter } from "./routes/auth.js";
+import { groupsRouter } from "./routes/groups.js";
 import { usersRouter } from "./routes/users.js";
 import type { AppEnv } from "./lib/types.js";
 
@@ -21,6 +22,7 @@ app.get("/health", (c) => c.json({ ok: true }));
 
 app.route("/auth", authRouter);
 app.route("/users", usersRouter);
+app.route("/groups", groupsRouter);
 
 app.doc("/doc", {
   openapi: "3.0.0",

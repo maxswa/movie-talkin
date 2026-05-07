@@ -7,7 +7,7 @@ import type { AppEnv } from "../lib/types.js";
 export const requireGroupMember = (role?: "host") =>
   createMiddleware<AppEnv>(async (c, next) => {
     const user = c.get("user");
-    const groupId = Number(c.req.param("groupId"));
+    const groupId = c.req.param("groupId");
 
     if (!groupId) return c.json({ error: "Missing groupId" }, 400);
 

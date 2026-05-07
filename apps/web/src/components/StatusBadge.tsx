@@ -1,6 +1,6 @@
 import type { WatchPartyStatus } from "../lib/api";
 
-const STATUS_META: Record<WatchPartyStatus, { label: string; classes: string }> = {
+export const STATUS_META: Record<WatchPartyStatus, { label: string; classes: string }> = {
   draft:                          { label: "Planning",           classes: "bg-white/10 text-white/50" },
   open_for_category_suggestions:  { label: "Suggest a Category", classes: "bg-accent-blue/20 text-accent-blue" },
   category_suggestions_closed:    { label: "Category Chosen",    classes: "bg-accent-purple/20 text-accent-purple" },

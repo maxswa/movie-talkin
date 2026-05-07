@@ -10,7 +10,10 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SearchRouteImport } from './routes/search'
+import { Route as PartiesRouteImport } from './routes/parties'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PartiesIndexRouteImport } from './routes/parties.index'
+import { Route as PartiesPartyIdRouteImport } from './routes/parties.$partyId'
 import { Route as AuthVerifyRouteImport } from './routes/auth.verify'
 
 const SearchRoute = SearchRouteImport.update({
@@ -18,10 +21,25 @@ const SearchRoute = SearchRouteImport.update({
   path: '/search',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PartiesRoute = PartiesRouteImport.update({
+  id: '/parties',
+  path: '/parties',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const PartiesIndexRoute = PartiesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PartiesRoute,
+} as any)
+const PartiesPartyIdRoute = PartiesPartyIdRouteImport.update({
+  id: '/$partyId',
+  path: '/$partyId',
+  getParentRoute: () => PartiesRoute,
 } as any)
 const AuthVerifyRoute = AuthVerifyRouteImport.update({
   id: '/auth/verify',
@@ -31,30 +49,52 @@ const AuthVerifyRoute = AuthVerifyRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/parties': typeof PartiesRouteWithChildren
   '/search': typeof SearchRoute
   '/auth/verify': typeof AuthVerifyRoute
+  '/parties/$partyId': typeof PartiesPartyIdRoute
+  '/parties/': typeof PartiesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/search': typeof SearchRoute
   '/auth/verify': typeof AuthVerifyRoute
+  '/parties/$partyId': typeof PartiesPartyIdRoute
+  '/parties': typeof PartiesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/parties': typeof PartiesRouteWithChildren
   '/search': typeof SearchRoute
   '/auth/verify': typeof AuthVerifyRoute
+  '/parties/$partyId': typeof PartiesPartyIdRoute
+  '/parties/': typeof PartiesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/search' | '/auth/verify'
+  fullPaths:
+    | '/'
+    | '/parties'
+    | '/search'
+    | '/auth/verify'
+    | '/parties/$partyId'
+    | '/parties/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/search' | '/auth/verify'
-  id: '__root__' | '/' | '/search' | '/auth/verify'
+  to: '/' | '/search' | '/auth/verify' | '/parties/$partyId' | '/parties'
+  id:
+    | '__root__'
+    | '/'
+    | '/parties'
+    | '/search'
+    | '/auth/verify'
+    | '/parties/$partyId'
+    | '/parties/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  PartiesRoute: typeof PartiesRouteWithChildren
   SearchRoute: typeof SearchRoute
   AuthVerifyRoute: typeof AuthVerifyRoute
 }
@@ -68,12 +108,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SearchRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/parties': {
+      id: '/parties'
+      path: '/parties'
+      fullPath: '/parties'
+      preLoaderRoute: typeof PartiesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/parties/': {
+      id: '/parties/'
+      path: '/'
+      fullPath: '/parties/'
+      preLoaderRoute: typeof PartiesIndexRouteImport
+      parentRoute: typeof PartiesRoute
+    }
+    '/parties/$partyId': {
+      id: '/parties/$partyId'
+      path: '/$partyId'
+      fullPath: '/parties/$partyId'
+      preLoaderRoute: typeof PartiesPartyIdRouteImport
+      parentRoute: typeof PartiesRoute
     }
     '/auth/verify': {
       id: '/auth/verify'
@@ -85,8 +146,22 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface PartiesRouteChildren {
+  PartiesPartyIdRoute: typeof PartiesPartyIdRoute
+  PartiesIndexRoute: typeof PartiesIndexRoute
+}
+
+const PartiesRouteChildren: PartiesRouteChildren = {
+  PartiesPartyIdRoute: PartiesPartyIdRoute,
+  PartiesIndexRoute: PartiesIndexRoute,
+}
+
+const PartiesRouteWithChildren =
+  PartiesRoute._addFileChildren(PartiesRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  PartiesRoute: PartiesRouteWithChildren,
   SearchRoute: SearchRoute,
   AuthVerifyRoute: AuthVerifyRoute,
 }

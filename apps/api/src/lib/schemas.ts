@@ -30,3 +30,43 @@ export const GroupDetailSchema = GroupSchema.extend({
 export const GroupSummarySchema = GroupSchema.extend({
   role: z.enum(["host", "guest"]),
 });
+
+export const WATCH_PARTY_STATUSES = [
+  "draft",
+  "open_for_category_suggestions",
+  "category_suggestions_closed",
+  "open_for_movie_suggestions",
+  "movie_suggestions_closed",
+  "voting",
+  "movie_selected",
+  "watched",
+] as const;
+
+export type WatchPartyStatus = (typeof WATCH_PARTY_STATUSES)[number];
+
+export const WatchPartySchema = z.object({
+  id: z.string(),
+  watchGroupId: z.string(),
+  status: z.enum(WATCH_PARTY_STATUSES),
+  scheduledFor: z.string().nullable(),
+  selectedCategory: z.string().nullable(),
+  winningSuggestionId: z.string().nullable(),
+  createdAt: z.string(),
+});
+
+export const MovieSuggestionSchema = z.object({
+  id: z.string(),
+  watchPartyId: z.string(),
+  suggestedBy: z.string(),
+  tmdbId: z.number(),
+  title: z.string(),
+  posterPath: z.string().nullable(),
+  overview: z.string().nullable(),
+  releaseYear: z.number().nullable(),
+  createdAt: z.string(),
+});
+
+export const WatchPartyDetailSchema = WatchPartySchema.extend({
+  members: z.array(GroupMemberSchema),
+  winningSuggestion: MovieSuggestionSchema.nullable(),
+});

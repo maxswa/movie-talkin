@@ -17,7 +17,7 @@ Routes are grouped by resource. Each section lists the endpoints, who can call t
 - [x] 1. Auth middleware & session
 - [x] 2. Users
 - [x] 3. Watch groups
-- [ ] 4. Watch parties — CRUD & status transitions
+- [x] 4. Watch parties — CRUD & status transitions
 - [ ] 5. Category suggestions
 - [ ] 6. TMDB search proxy
 - [ ] 7. Movie suggestions

@@ -1,8 +1,8 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import { and, count, eq } from "drizzle-orm";
 import { db } from "../db/client.js";
-import { users, watchGroupMembers, watchGroups } from "../db/schema.js";
-import { ErrorSchema, GroupDetailSchema, GroupSchema, GroupSummarySchema } from "../lib/schemas.js";
+import { users, watchGroupMembers, watchGroups, watchParties } from "../db/schema.js";
+import { ErrorSchema, GroupDetailSchema, GroupSchema, GroupSummarySchema, WatchPartySchema } from "../lib/schemas.js";
 import { requireAuth } from "../middleware/auth.js";
 import { requireGroupMember } from "../middleware/group.js";
 import type { AppEnv } from "../lib/types.js";
@@ -174,5 +174,26 @@ groupsRouter.openapi(
       .where(and(eq(watchGroupMembers.groupId, groupId), eq(watchGroupMembers.userId, userId)));
 
     return c.json({ ok: true }, 200);
+  }
+);
+
+groupsRouter.openapi(
+  createRoute({
+    method: "post",
+    path: "/{groupId}/parties",
+    tags: ["Parties"],
+    summary: "Create a watch party for the group (host only)",
+    middleware: [requireAuth, requireGroupMember("host")],
+    request: { params: GroupIdParam },
+    responses: {
+      201: { content: { "application/json": { schema: WatchPartySchema } }, description: "Party created" },
+      401: { content: { "application/json": { schema: ErrorSchema } }, description: "Not authenticated" },
+      403: { content: { "application/json": { schema: ErrorSchema } }, description: "Not a host" },
+    },
+  }),
+  async (c) => {
+    const { groupId } = c.req.valid("param");
+    const [party] = await db.insert(watchParties).values({ watchGroupId: groupId }).returning();
+    return c.json({ ...party, status: party.status as "draft" }, 201);
   }
 );

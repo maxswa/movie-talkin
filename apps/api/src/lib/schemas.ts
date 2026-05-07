@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 export const ErrorSchema = z.object({ error: z.string() });
 export const OkSchema = z.object({ ok: z.boolean() });
@@ -13,7 +13,7 @@ export const UserSchema = z.object({
 export const GroupMemberSchema = z.object({
   userId: z.string(),
   name: z.string(),
-  role: z.enum(["host", "guest"]),
+  role: z.enum(['host', 'guest']),
   joinedAt: z.string(),
 });
 
@@ -28,18 +28,18 @@ export const GroupDetailSchema = GroupSchema.extend({
 });
 
 export const GroupSummarySchema = GroupSchema.extend({
-  role: z.enum(["host", "guest"]),
+  role: z.enum(['host', 'guest']),
 });
 
 export const WATCH_PARTY_STATUSES = [
-  "draft",
-  "open_for_category_suggestions",
-  "category_suggestions_closed",
-  "open_for_movie_suggestions",
-  "movie_suggestions_closed",
-  "voting",
-  "movie_selected",
-  "watched",
+  'draft',
+  'open_for_category_suggestions',
+  'category_suggestions_closed',
+  'open_for_movie_suggestions',
+  'movie_suggestions_closed',
+  'voting',
+  'movie_selected',
+  'watched',
 ] as const;
 
 export type WatchPartyStatus = (typeof WATCH_PARTY_STATUSES)[number];

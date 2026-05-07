@@ -1,18 +1,18 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
-import { api } from "../lib/api";
-import { nextStatus } from "../lib/utils";
-import { STATUS_META } from "./StatusBadge";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
+import { api, WatchParty } from '../lib/api';
+import { nextStatus } from '../lib/utils';
+import { STATUS_META } from './StatusBadge';
 
 export function AdvancePartyButton({ party }: { party: WatchParty }) {
   const queryClient = useQueryClient();
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
 
   const next = nextStatus(party.status);
-  const needsCategoryPick = party.status === "open_for_category_suggestions";
+  const needsCategoryPick = party.status === 'open_for_category_suggestions';
 
   const { data: categorySuggestions = [] } = useQuery({
-    queryKey: ["category-suggestions", party.id],
+    queryKey: ['category-suggestions', party.id],
     queryFn: () => api.categorySuggestions.list(party.id),
     enabled: needsCategoryPick,
   });
@@ -24,8 +24,8 @@ export function AdvancePartyButton({ party }: { party: WatchParty }) {
         needsCategoryPick && selectedCategory ? { selectedCategory } : {},
       ),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["parties"] });
-      queryClient.invalidateQueries({ queryKey: ["party", party.id] });
+      queryClient.invalidateQueries({ queryKey: ['parties'] });
+      queryClient.invalidateQueries({ queryKey: ['party', party.id] });
     },
   });
 
@@ -33,7 +33,7 @@ export function AdvancePartyButton({ party }: { party: WatchParty }) {
 
   const nextLabel = STATUS_META[next].label;
   const canAdvance =
-    !needsCategoryPick || (categorySuggestions.length > 0 && selectedCategory !== "");
+    !needsCategoryPick || (categorySuggestions.length > 0 && selectedCategory !== '');
 
   return (
     <div className="flex flex-col gap-3">
@@ -60,7 +60,7 @@ export function AdvancePartyButton({ party }: { party: WatchParty }) {
         disabled={!canAdvance || mutation.isPending}
         className="rounded-xl bg-accent-purple px-4 py-3 text-sm font-medium disabled:opacity-40 transition-opacity"
       >
-        {mutation.isPending ? "Advancing…" : `Advance to "${nextLabel}"`}
+        {mutation.isPending ? 'Advancing…' : `Advance to "${nextLabel}"`}
       </button>
 
       {mutation.isError && (

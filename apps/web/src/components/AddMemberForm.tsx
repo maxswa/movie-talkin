@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { api } from "../lib/api";
-import { useQueryClient } from "@tanstack/react-query";
+import { useState } from 'react';
+import { api } from '../lib/api';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface Props {
   groupId: string;
@@ -8,9 +8,9 @@ interface Props {
 
 export function AddMemberForm({ groupId }: Props) {
   const queryClient = useQueryClient();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [role, setRole] = useState<"guest" | "host">("guest");
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [role, setRole] = useState<'guest' | 'host'>('guest');
   const [magicLink, setMagicLink] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -28,11 +28,11 @@ export function AddMemberForm({ groupId }: Props) {
     try {
       const newUser = await api.users.create(trimmedName, email.trim() || undefined);
       await api.groups.addMember(groupId, newUser.id, role);
-      queryClient.invalidateQueries({ queryKey: ["group-detail", groupId] });
+      queryClient.invalidateQueries({ queryKey: ['group-detail', groupId] });
       setMagicLink(newUser.magicLink);
-      setName("");
-      setEmail("");
-      setRole("guest");
+      setName('');
+      setEmail('');
+      setRole('guest');
     } catch (err) {
       setError((err as Error).message);
     } finally {
@@ -65,15 +65,15 @@ export function AddMemberForm({ groupId }: Props) {
           className="rounded-xl bg-white/10 px-4 py-3 text-sm placeholder:text-white/30 outline-none focus:ring-2 focus:ring-accent-purple/50"
         />
         <div className="flex rounded-xl overflow-hidden border border-white/10 text-sm">
-          {(["guest", "host"] as const).map((r) => (
+          {(['guest', 'host'] as const).map((r) => (
             <button
               key={r}
               type="button"
               onClick={() => setRole(r)}
               className={`flex-1 py-3 font-medium transition-colors capitalize ${
                 role === r
-                  ? "bg-accent-purple text-white"
-                  : "bg-white/5 text-white/40 hover:text-white"
+                  ? 'bg-accent-purple text-white'
+                  : 'bg-white/5 text-white/40 hover:text-white'
               }`}
             >
               {r}
@@ -86,7 +86,7 @@ export function AddMemberForm({ groupId }: Props) {
           disabled={!name.trim() || pending}
           className="rounded-xl bg-accent-purple px-4 py-3 text-sm font-medium disabled:opacity-40 transition-opacity"
         >
-          {pending ? "Adding…" : "Add member"}
+          {pending ? 'Adding…' : 'Add member'}
         </button>
       </form>
 
@@ -101,7 +101,7 @@ export function AddMemberForm({ groupId }: Props) {
               onClick={copyLink}
               className="shrink-0 text-xs text-accent-blue hover:text-white transition-colors"
             >
-              {copied ? "Copied!" : "Copy"}
+              {copied ? 'Copied!' : 'Copy'}
             </button>
           </div>
         </div>

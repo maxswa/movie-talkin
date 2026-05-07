@@ -1,12 +1,12 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
-import { AdvancePartyButton } from "../components/AdvancePartyButton";
-import { MemberList } from "../components/MemberList";
-import { StatusBadge } from "../components/StatusBadge";
-import { api, type WatchParty } from "../lib/api";
-import { toLocalInputValue } from "../lib/utils";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { createFileRoute } from '@tanstack/react-router';
+import { AdvancePartyButton } from '../components/AdvancePartyButton';
+import { MemberList } from '../components/MemberList';
+import { StatusBadge } from '../components/StatusBadge';
+import { api, type WatchParty } from '../lib/api';
+import { toLocalInputValue } from '../lib/utils';
 
-export const Route = createFileRoute("/parties/$partyId")({
+export const Route = createFileRoute('/parties/$partyId')({
   component: PartyDetailPage,
 });
 
@@ -15,18 +15,17 @@ function PartyDetailPage() {
   const queryClient = useQueryClient();
 
   const { data: party, isLoading } = useQuery({
-    queryKey: ["party", partyId],
+    queryKey: ['party', partyId],
     queryFn: () => api.parties.get(partyId),
   });
 
   const updateMutation = useMutation({
-    mutationFn: (scheduledFor: string | null) =>
-      api.parties.update(partyId, { scheduledFor }),
+    mutationFn: (scheduledFor: string | null) => api.parties.update(partyId, { scheduledFor }),
     onSuccess: (updated) => {
-      queryClient.setQueryData<WatchParty>(["party", partyId], (old) =>
+      queryClient.setQueryData<WatchParty>(['party', partyId], (old) =>
         old ? { ...old, ...updated } : updated,
       );
-      queryClient.invalidateQueries({ queryKey: ["parties"] });
+      queryClient.invalidateQueries({ queryKey: ['parties'] });
     },
   });
 
@@ -51,9 +50,7 @@ function PartyDetailPage() {
     <div className="flex flex-col gap-6 px-4 py-6">
       <div className="flex items-center gap-3">
         <StatusBadge status={party.status} />
-        {updateMutation.isPending && (
-          <span className="text-xs text-white/30">Saving…</span>
-        )}
+        {updateMutation.isPending && <span className="text-xs text-white/30">Saving…</span>}
       </div>
 
       <section className="flex flex-col gap-2">
@@ -67,7 +64,9 @@ function PartyDetailPage() {
       </section>
 
       <section className="flex flex-col gap-3">
-        <h2 className="text-sm font-semibold text-white/60 uppercase tracking-wide">Advance stage</h2>
+        <h2 className="text-sm font-semibold text-white/60 uppercase tracking-wide">
+          Advance stage
+        </h2>
         <AdvancePartyButton party={party} />
       </section>
 

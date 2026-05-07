@@ -1,0 +1,4 @@
+node_modules
+dist
+.drizzle
+apps/web/src/routeTree.gen.ts

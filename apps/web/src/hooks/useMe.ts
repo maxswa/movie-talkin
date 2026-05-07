@@ -1,15 +1,15 @@
-import { useQuery } from "@tanstack/react-query";
-import { api } from "../lib/api";
+import { useQuery } from '@tanstack/react-query';
+import { api } from '../lib/api';
 
 export function useMe() {
   const userQuery = useQuery({
-    queryKey: ["me"],
+    queryKey: ['me'],
     queryFn: api.auth.me,
     retry: false,
   });
 
   const groupsQuery = useQuery({
-    queryKey: ["groups"],
+    queryKey: ['groups'],
     queryFn: api.groups.list,
     enabled: !!userQuery.data,
     retry: false,
@@ -20,7 +20,7 @@ export function useMe() {
   return {
     user: userQuery.data ?? null,
     group,
-    isHost: group?.role === "host",
+    isHost: group?.role === 'host',
     isAuthenticated: !!userQuery.data,
     isLoading: userQuery.isLoading || (!!userQuery.data && groupsQuery.isLoading),
   };

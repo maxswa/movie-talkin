@@ -1,5 +1,5 @@
-import { Link } from "@tanstack/react-router";
-import { tmdbImageUrl, type MovieSuggestion } from "../lib/api";
+import { Link } from '@tanstack/react-router';
+import { tmdbImageUrl, type MovieSuggestion } from '../lib/api';
 
 interface Props {
   suggestion: MovieSuggestion;
@@ -8,15 +8,19 @@ interface Props {
 }
 
 export function MovieSuggestionItem({ suggestion, isOwn, partyId }: Props) {
-  const poster = tmdbImageUrl(suggestion.posterPath, "w92");
+  const poster = tmdbImageUrl(suggestion.posterPath, 'w92');
   return (
     <li
       className={`flex items-center gap-3 rounded-xl p-3 ${
-        isOwn ? "bg-accent-purple/10 ring-1 ring-accent-purple/30" : "bg-white/5"
+        isOwn ? 'bg-accent-purple/10 ring-1 ring-accent-purple/30' : 'bg-white/5'
       }`}
     >
       {poster ? (
-        <img src={poster} alt={suggestion.title} className="w-10 h-14 object-cover rounded-lg shrink-0" />
+        <img
+          src={poster}
+          alt={suggestion.title}
+          className="w-10 h-14 object-cover rounded-lg shrink-0"
+        />
       ) : (
         <div className="w-10 h-14 rounded-lg bg-white/10 shrink-0" />
       )}

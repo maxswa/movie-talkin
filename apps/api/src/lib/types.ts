@@ -1,4 +1,4 @@
-import type { users } from "../db/schema.js";
+import type { users } from '../db/schema.js';
 
 export type AppEnv = {
   Variables: {

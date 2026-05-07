@@ -63,12 +63,8 @@
           "name": "brackets_watch_party_id_watch_parties_id_fk",
           "tableFrom": "brackets",
           "tableTo": "watch_parties",
-          "columnsFrom": [
-            "watch_party_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["watch_party_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -76,12 +72,8 @@
           "name": "brackets_suggestion_a_id_movie_suggestions_id_fk",
           "tableFrom": "brackets",
           "tableTo": "movie_suggestions",
-          "columnsFrom": [
-            "suggestion_a_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["suggestion_a_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -89,12 +81,8 @@
           "name": "brackets_suggestion_b_id_movie_suggestions_id_fk",
           "tableFrom": "brackets",
           "tableTo": "movie_suggestions",
-          "columnsFrom": [
-            "suggestion_b_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["suggestion_b_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -102,12 +90,8 @@
           "name": "brackets_winner_id_movie_suggestions_id_fk",
           "tableFrom": "brackets",
           "tableTo": "movie_suggestions",
-          "columnsFrom": [
-            "winner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["winner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -161,12 +145,8 @@
           "name": "category_suggestions_watch_party_id_watch_parties_id_fk",
           "tableFrom": "category_suggestions",
           "tableTo": "watch_parties",
-          "columnsFrom": [
-            "watch_party_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["watch_party_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -174,12 +154,8 @@
           "name": "category_suggestions_suggested_by_users_id_fk",
           "tableFrom": "category_suggestions",
           "tableTo": "users",
-          "columnsFrom": [
-            "suggested_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["suggested_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -237,9 +213,7 @@
       "indexes": {
         "magic_link_tokens_token_unique": {
           "name": "magic_link_tokens_token_unique",
-          "columns": [
-            "token"
-          ],
+          "columns": ["token"],
           "isUnique": true
         }
       },
@@ -248,12 +222,8 @@
           "name": "magic_link_tokens_user_id_users_id_fk",
           "tableFrom": "magic_link_tokens",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -335,12 +305,8 @@
           "name": "movie_suggestions_watch_party_id_watch_parties_id_fk",
           "tableFrom": "movie_suggestions",
           "tableTo": "watch_parties",
-          "columnsFrom": [
-            "watch_party_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["watch_party_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -348,12 +314,8 @@
           "name": "movie_suggestions_suggested_by_users_id_fk",
           "tableFrom": "movie_suggestions",
           "tableTo": "users",
-          "columnsFrom": [
-            "suggested_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["suggested_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -411,10 +373,7 @@
       "indexes": {
         "movie_votes_bracket_id_user_id_unique": {
           "name": "movie_votes_bracket_id_user_id_unique",
-          "columns": [
-            "bracket_id",
-            "user_id"
-          ],
+          "columns": ["bracket_id", "user_id"],
           "isUnique": true
         }
       },
@@ -423,12 +382,8 @@
           "name": "movie_votes_bracket_id_brackets_id_fk",
           "tableFrom": "movie_votes",
           "tableTo": "brackets",
-          "columnsFrom": [
-            "bracket_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["bracket_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -436,12 +391,8 @@
           "name": "movie_votes_user_id_users_id_fk",
           "tableFrom": "movie_votes",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -449,12 +400,8 @@
           "name": "movie_votes_voted_for_movie_suggestions_id_fk",
           "tableFrom": "movie_votes",
           "tableTo": "movie_suggestions",
-          "columnsFrom": [
-            "voted_for"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["voted_for"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -498,9 +445,7 @@
       "indexes": {
         "users_email_unique": {
           "name": "users_email_unique",
-          "columns": [
-            "email"
-          ],
+          "columns": ["email"],
           "isUnique": true
         }
       },
@@ -545,10 +490,7 @@
       "indexes": {
         "watch_group_members_group_id_user_id_unique": {
           "name": "watch_group_members_group_id_user_id_unique",
-          "columns": [
-            "group_id",
-            "user_id"
-          ],
+          "columns": ["group_id", "user_id"],
           "isUnique": true
         }
       },
@@ -557,12 +499,8 @@
           "name": "watch_group_members_group_id_watch_groups_id_fk",
           "tableFrom": "watch_group_members",
           "tableTo": "watch_groups",
-          "columnsFrom": [
-            "group_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["group_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -570,12 +508,8 @@
           "name": "watch_group_members_user_id_users_id_fk",
           "tableFrom": "watch_group_members",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -675,12 +609,8 @@
           "name": "watch_parties_watch_group_id_watch_groups_id_fk",
           "tableFrom": "watch_parties",
           "tableTo": "watch_groups",
-          "columnsFrom": [
-            "watch_group_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["watch_group_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }

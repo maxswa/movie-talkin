@@ -1,12 +1,10 @@
-import type { GroupMember } from "../lib/api";
+import type { GroupMember } from '../lib/api';
 
-function RoleBadge({ role }: { role: "host" | "guest" }) {
+function RoleBadge({ role }: { role: 'host' | 'guest' }) {
   return (
     <span
       className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-        role === "host"
-          ? "bg-accent-purple/20 text-accent-purple"
-          : "bg-white/10 text-white/40"
+        role === 'host' ? 'bg-accent-purple/20 text-accent-purple' : 'bg-white/10 text-white/40'
       }`}
     >
       {role}

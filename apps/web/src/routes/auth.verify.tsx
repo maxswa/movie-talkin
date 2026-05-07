@@ -1,9 +1,9 @@
-import { useQueryClient } from "@tanstack/react-query";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { api } from "../lib/api";
+import { useQueryClient } from '@tanstack/react-query';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { useEffect, useState } from 'react';
+import { api } from '../lib/api';
 
-export const Route = createFileRoute("/auth/verify")({
+export const Route = createFileRoute('/auth/verify')({
   validateSearch: (search: Record<string, unknown>) => ({
     token: search.token as string | undefined,
   }),
@@ -18,15 +18,15 @@ function VerifyPage() {
 
   useEffect(() => {
     if (!token) {
-      setError("No token provided.");
+      setError('No token provided.');
       return;
     }
     api.auth
       .verify(token)
       .then(() => {
-        queryClient.resetQueries({ queryKey: ["me"] });
-        queryClient.resetQueries({ queryKey: ["groups"] });
-        navigate({ to: "/" });
+        queryClient.resetQueries({ queryKey: ['me'] });
+        queryClient.resetQueries({ queryKey: ['groups'] });
+        navigate({ to: '/' });
       })
       .catch((e: Error) => setError(e.message));
   }, [token, navigate, queryClient]);
@@ -35,7 +35,9 @@ function VerifyPage() {
     return (
       <div className="flex flex-col items-center gap-4 pt-16 text-center">
         <p className="text-red-400 text-lg">{error}</p>
-        <p className="text-gray-500 text-sm">Your link may have expired. Ask the host for a new one.</p>
+        <p className="text-gray-500 text-sm">
+          Your link may have expired. Ask the host for a new one.
+        </p>
       </div>
     );
   }

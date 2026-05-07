@@ -1,15 +1,15 @@
-import { eq } from "drizzle-orm";
-import { db } from "./client.js";
-import { users, watchGroupMembers, watchGroups } from "./schema.js";
-import { generateMagicLink } from "../lib/magic-link.js";
+import { eq } from 'drizzle-orm';
+import { db } from './client.js';
+import { users, watchGroupMembers, watchGroups } from './schema.js';
+import { generateMagicLink } from '../lib/magic-link.js';
 
 const HOST_NAME = process.env.SEED_HOST_NAME;
 const HOST_EMAIL = process.env.SEED_HOST_EMAIL;
 const GROUP_NAME = process.env.SEED_GROUP_NAME;
-const APP_URL = process.env.APP_URL ?? "http://localhost:5173";
+const APP_URL = process.env.APP_URL ?? 'http://localhost:5173';
 
 if (!HOST_NAME || !GROUP_NAME) {
-  console.error("Error: SEED_HOST_NAME and SEED_GROUP_NAME must be set in your .env");
+  console.error('Error: SEED_HOST_NAME and SEED_GROUP_NAME must be set in your .env');
   process.exit(1);
 }
 
@@ -29,10 +29,7 @@ if (!user) {
 // 2. Upsert watch group
 let group = await db.query.watchGroups.findFirst({ where: eq(watchGroups.name, GROUP_NAME) });
 if (!group) {
-  const [created] = await db
-    .insert(watchGroups)
-    .values({ name: GROUP_NAME })
-    .returning();
+  const [created] = await db.insert(watchGroups).values({ name: GROUP_NAME }).returning();
   group = created;
   console.log(`Created watch group "${group.name}" (id: ${group.id})`);
 } else {
@@ -42,7 +39,7 @@ if (!group) {
 // 3. Add user to group as host (no-op if already a member)
 await db
   .insert(watchGroupMembers)
-  .values({ groupId: group.id, userId: user.id, role: "host" })
+  .values({ groupId: group.id, userId: user.id, role: 'host' })
   .onConflictDoNothing();
 console.log(`Ensured "${user.name}" is a host of "${group.name}"`);
 

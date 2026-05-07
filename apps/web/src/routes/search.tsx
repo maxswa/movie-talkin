@@ -1,12 +1,12 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { TmdbMovieItem } from "../components/TmdbMovieItem";
-import { api, type TmdbMovie } from "../lib/api";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { useEffect, useState } from 'react';
+import { TmdbMovieItem } from '../components/TmdbMovieItem';
+import { api, type TmdbMovie } from '../lib/api';
 
-export const Route = createFileRoute("/search")({
+export const Route = createFileRoute('/search')({
   validateSearch: (search: Record<string, unknown>) => ({
-    partyId: (search.partyId as string) ?? "",
+    partyId: (search.partyId as string) ?? '',
   }),
   component: Search,
 });
@@ -16,8 +16,8 @@ function Search() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const [query, setQuery] = useState("");
-  const [debouncedQuery, setDebouncedQuery] = useState("");
+  const [query, setQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedQuery(query), 350);
@@ -25,7 +25,7 @@ function Search() {
   }, [query]);
 
   const { data: results = [] } = useQuery({
-    queryKey: ["tmdb-search", debouncedQuery],
+    queryKey: ['tmdb-search', debouncedQuery],
     queryFn: () => api.tmdb.search(debouncedQuery),
     enabled: debouncedQuery.length >= 2,
   });
@@ -33,8 +33,8 @@ function Search() {
   const mutation = useMutation({
     mutationFn: (tmdbId: number) => api.movieSuggestions.create(partyId, tmdbId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["movie-suggestions", partyId] });
-      navigate({ to: "/" });
+      queryClient.invalidateQueries({ queryKey: ['movie-suggestions', partyId] });
+      navigate({ to: '/' });
     },
   });
 
@@ -46,7 +46,7 @@ function Search() {
     <div className="flex flex-col gap-5 p-5">
       <div className="flex items-center gap-3 pt-2">
         <button
-          onClick={() => navigate({ to: "/" })}
+          onClick={() => navigate({ to: '/' })}
           className="text-white/50 hover:text-white transition-colors text-xl leading-none"
           aria-label="Back"
         >

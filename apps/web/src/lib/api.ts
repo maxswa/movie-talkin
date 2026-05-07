@@ -1,9 +1,9 @@
-const BASE = "/api";
+const BASE = '/api';
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
-    credentials: "include",
-    headers: { "Content-Type": "application/json" },
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
     ...init,
   });
   if (!res.ok) {
@@ -28,29 +28,29 @@ export interface Group {
   id: string;
   name: string;
   createdAt: string;
-  role: "host" | "guest";
+  role: 'host' | 'guest';
 }
 
 export interface GroupMember {
   userId: string;
   name: string;
-  role: "host" | "guest";
+  role: 'host' | 'guest';
   joinedAt: string;
 }
 
-export interface GroupDetail extends Omit<Group, "role"> {
+export interface GroupDetail extends Omit<Group, 'role'> {
   members: GroupMember[];
 }
 
 export type WatchPartyStatus =
-  | "draft"
-  | "open_for_category_suggestions"
-  | "category_suggestions_closed"
-  | "open_for_movie_suggestions"
-  | "movie_suggestions_closed"
-  | "voting"
-  | "movie_selected"
-  | "watched";
+  | 'draft'
+  | 'open_for_category_suggestions'
+  | 'category_suggestions_closed'
+  | 'open_for_movie_suggestions'
+  | 'movie_suggestions_closed'
+  | 'voting'
+  | 'movie_selected'
+  | 'watched';
 
 export interface WatchParty {
   id: string;
@@ -116,7 +116,7 @@ export interface BracketRound {
   brackets: Bracket[];
 }
 
-export function tmdbImageUrl(path: string | null, size = "w342"): string | null {
+export function tmdbImageUrl(path: string | null, size = 'w342'): string | null {
   if (!path) return null;
   return `https://image.tmdb.org/t/p/${size}${path}`;
 }
@@ -128,45 +128,45 @@ export function tmdbImageUrl(path: string | null, size = "w342"): string | null 
 export const api = {
   auth: {
     verify: (token: string) => request<{ ok: boolean }>(`/auth/verify?token=${token}`),
-    me: () => request<User>("/auth/me"),
-    logout: () => request<{ ok: boolean }>("/auth/logout", { method: "POST" }),
+    me: () => request<User>('/auth/me'),
+    logout: () => request<{ ok: boolean }>('/auth/logout', { method: 'POST' }),
   },
 
   users: {
     create: (name: string, email?: string) =>
-      request<User & { magicLink: string }>("/users", {
-        method: "POST",
+      request<User & { magicLink: string }>('/users', {
+        method: 'POST',
         body: JSON.stringify({ name, email }),
       }),
     magicLink: (userId: string) =>
-      request<{ magicLink: string }>(`/users/${userId}/magic-link`, { method: "POST" }),
+      request<{ magicLink: string }>(`/users/${userId}/magic-link`, { method: 'POST' }),
   },
 
   groups: {
-    list: () => request<Group[]>("/groups"),
+    list: () => request<Group[]>('/groups'),
     get: (groupId: string) => request<GroupDetail>(`/groups/${groupId}`),
-    addMember: (groupId: string, userId: string, role: "host" | "guest" = "guest") =>
+    addMember: (groupId: string, userId: string, role: 'host' | 'guest' = 'guest') =>
       request<{ ok: boolean }>(`/groups/${groupId}/members`, {
-        method: "POST",
+        method: 'POST',
         body: JSON.stringify({ userId, role }),
       }),
     removeMember: (groupId: string, userId: string) =>
-      request<{ ok: boolean }>(`/groups/${groupId}/members/${userId}`, { method: "DELETE" }),
+      request<{ ok: boolean }>(`/groups/${groupId}/members/${userId}`, { method: 'DELETE' }),
   },
 
   parties: {
     list: (groupId: string) => request<WatchParty[]>(`/groups/${groupId}/parties`),
     get: (partyId: string) => request<WatchPartyDetail>(`/parties/${partyId}`),
     create: (groupId: string) =>
-      request<WatchParty>(`/groups/${groupId}/parties`, { method: "POST" }),
+      request<WatchParty>(`/groups/${groupId}/parties`, { method: 'POST' }),
     update: (partyId: string, body: { scheduledFor?: string | null }) =>
       request<WatchParty>(`/parties/${partyId}`, {
-        method: "PATCH",
+        method: 'PATCH',
         body: JSON.stringify(body),
       }),
     advance: (partyId: string, body: { selectedCategory?: string } = {}) =>
       request<WatchParty>(`/parties/${partyId}/advance`, {
-        method: "POST",
+        method: 'POST',
         body: JSON.stringify(body),
       }),
   },
@@ -176,34 +176,32 @@ export const api = {
       request<CategorySuggestion[]>(`/parties/${partyId}/category-suggestions`),
     create: (partyId: string, name: string) =>
       request<CategorySuggestion>(`/parties/${partyId}/category-suggestions`, {
-        method: "POST",
+        method: 'POST',
         body: JSON.stringify({ name }),
       }),
   },
 
   movieSuggestions: {
-    list: (partyId: string) =>
-      request<MovieSuggestion[]>(`/parties/${partyId}/movie-suggestions`),
+    list: (partyId: string) => request<MovieSuggestion[]>(`/parties/${partyId}/movie-suggestions`),
     create: (partyId: string, tmdbId: number) =>
       request<MovieSuggestion>(`/parties/${partyId}/movie-suggestions`, {
-        method: "POST",
+        method: 'POST',
         body: JSON.stringify({ tmdbId }),
       }),
   },
 
   tmdb: {
-    search: (q: string) =>
-      request<TmdbMovie[]>(`/tmdb/search?q=${encodeURIComponent(q)}`),
+    search: (q: string) => request<TmdbMovie[]>(`/tmdb/search?q=${encodeURIComponent(q)}`),
   },
 
   brackets: {
     list: (partyId: string) => request<BracketRound[]>(`/parties/${partyId}/brackets`),
     vote: (bracketId: string, suggestionId: string) =>
       request<{ ok: boolean }>(`/brackets/${bracketId}/vote`, {
-        method: "POST",
+        method: 'POST',
         body: JSON.stringify({ suggestionId }),
       }),
     closeRound: (partyId: string) =>
-      request<WatchParty>(`/parties/${partyId}/brackets/close-round`, { method: "POST" }),
+      request<WatchParty>(`/parties/${partyId}/brackets/close-round`, { method: 'POST' }),
   },
 };

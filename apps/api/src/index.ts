@@ -1,34 +1,37 @@
-import { serve, upgradeWebSocket } from "@hono/node-server";
-import { swaggerUI } from "@hono/swagger-ui";
-import { OpenAPIHono } from "@hono/zod-openapi";
-import { cors } from "hono/cors";
-import { logger } from "hono/logger";
-import { WebSocketServer } from "ws";
-import { subscribe } from "./lib/pubsub.js";
-import { authRouter } from "./routes/auth.js";
-import { bracketsRouter } from "./routes/brackets.js";
-import { groupsRouter } from "./routes/groups.js";
-import { partiesRouter } from "./routes/parties.js";
-import { tmdbRouter } from "./routes/tmdb.js";
-import { usersRouter } from "./routes/users.js";
-import type { AppEnv } from "./lib/types.js";
+import { serve, upgradeWebSocket } from '@hono/node-server';
+import { swaggerUI } from '@hono/swagger-ui';
+import { OpenAPIHono } from '@hono/zod-openapi';
+import { cors } from 'hono/cors';
+import { logger } from 'hono/logger';
+import { WebSocketServer } from 'ws';
+import { subscribe } from './lib/pubsub.js';
+import { authRouter } from './routes/auth.js';
+import { bracketsRouter } from './routes/brackets.js';
+import { groupsRouter } from './routes/groups.js';
+import { partiesRouter } from './routes/parties.js';
+import { tmdbRouter } from './routes/tmdb.js';
+import { usersRouter } from './routes/users.js';
+import type { AppEnv } from './lib/types.js';
 
 const app = new OpenAPIHono<AppEnv>();
 
-app.use("*", logger());
-app.use("*", cors({ origin: process.env.CORS_ORIGIN ?? "http://localhost:5173", credentials: true }));
+app.use('*', logger());
+app.use(
+  '*',
+  cors({ origin: process.env.CORS_ORIGIN ?? 'http://localhost:5173', credentials: true }),
+);
 
 app.onError((err, c) => {
   console.error(err);
   return c.json({ error: err.message }, 500);
 });
 
-app.get("/health", (c) => c.json({ ok: true }));
+app.get('/health', (c) => c.json({ ok: true }));
 
 app.get(
-  "/ws/parties/:partyId",
+  '/ws/parties/:partyId',
   upgradeWebSocket((c) => {
-    const partyId = c.req.param("partyId");
+    const partyId = c.req.param('partyId');
     let unsubscribe: (() => void) | null = null;
 
     return {
@@ -44,18 +47,18 @@ app.get(
   }),
 );
 
-app.route("/auth", authRouter);
-app.route("/users", usersRouter);
-app.route("/groups", groupsRouter);
-app.route("/parties", partiesRouter);
-app.route("/brackets", bracketsRouter);
-app.route("/tmdb", tmdbRouter);
+app.route('/auth', authRouter);
+app.route('/users', usersRouter);
+app.route('/groups', groupsRouter);
+app.route('/parties', partiesRouter);
+app.route('/brackets', bracketsRouter);
+app.route('/tmdb', tmdbRouter);
 
-app.doc("/doc", {
-  openapi: "3.0.0",
-  info: { title: "movie-talkin API", version: "0.1.0" },
+app.doc('/doc', {
+  openapi: '3.0.0',
+  info: { title: 'movie-talkin API', version: '0.1.0' },
 });
-app.get("/ui", swaggerUI({ url: "/doc" }));
+app.get('/ui', swaggerUI({ url: '/doc' }));
 
 const port = Number(process.env.PORT ?? 3000);
 const wss = new WebSocketServer({ noServer: true });

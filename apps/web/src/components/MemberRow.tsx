@@ -1,7 +1,7 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
-import type { GroupMember } from "../lib/api";
-import { api } from "../lib/api";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
+import type { GroupMember } from '../lib/api';
+import { api } from '../lib/api';
 
 interface Props {
   member: GroupMember;
@@ -23,7 +23,7 @@ export function MemberRow({ member, groupId, isLastHost }: Props) {
   const removeMutation = useMutation({
     mutationFn: () => api.groups.removeMember(groupId, member.userId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["group-detail", groupId] });
+      queryClient.invalidateQueries({ queryKey: ['group-detail', groupId] });
       setConfirming(false);
     },
   });
@@ -42,9 +42,9 @@ export function MemberRow({ member, groupId, isLastHost }: Props) {
           <span className="text-sm font-medium">{member.name}</span>
           <span
             className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-              member.role === "host"
-                ? "bg-accent-purple/20 text-accent-purple"
-                : "bg-white/10 text-white/40"
+              member.role === 'host'
+                ? 'bg-accent-purple/20 text-accent-purple'
+                : 'bg-white/10 text-white/40'
             }`}
           >
             {member.role}
@@ -57,7 +57,7 @@ export function MemberRow({ member, groupId, isLastHost }: Props) {
             disabled={magicLinkMutation.isPending}
             className="text-xs text-accent-blue hover:text-white disabled:opacity-40 transition-colors"
           >
-            {magicLinkMutation.isPending ? "…" : "Get link"}
+            {magicLinkMutation.isPending ? '…' : 'Get link'}
           </button>
 
           {!confirming ? (
@@ -75,7 +75,7 @@ export function MemberRow({ member, groupId, isLastHost }: Props) {
                 disabled={removeMutation.isPending}
                 className="text-xs text-red-400 hover:text-red-300 disabled:opacity-40"
               >
-                {removeMutation.isPending ? "…" : "Confirm"}
+                {removeMutation.isPending ? '…' : 'Confirm'}
               </button>
               <button
                 onClick={() => setConfirming(false)}
@@ -95,7 +95,7 @@ export function MemberRow({ member, groupId, isLastHost }: Props) {
             onClick={copyLink}
             className="shrink-0 text-xs text-accent-blue hover:text-white transition-colors"
           >
-            {copied ? "Copied!" : "Copy"}
+            {copied ? 'Copied!' : 'Copy'}
           </button>
         </div>
       )}

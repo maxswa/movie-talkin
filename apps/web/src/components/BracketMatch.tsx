@@ -1,6 +1,6 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { api, tmdbImageUrl, type Bracket } from "../lib/api";
-import { BracketMovieOption } from "./BracketMovieOption";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { api, tmdbImageUrl, type Bracket } from '../lib/api';
+import { BracketMovieOption } from './BracketMovieOption';
 
 interface Props {
   bracket: Bracket;
@@ -15,16 +15,20 @@ export function BracketMatch({ bracket, partyId, roundClosed }: Props) {
   const mutation = useMutation({
     mutationFn: (suggestionId: string) => api.brackets.vote(bracket.id, suggestionId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["brackets", partyId] });
+      queryClient.invalidateQueries({ queryKey: ['brackets', partyId] });
     },
   });
 
   if (isBye) {
-    const poster = tmdbImageUrl(bracket.suggestionA.posterPath, "w92");
+    const poster = tmdbImageUrl(bracket.suggestionA.posterPath, 'w92');
     return (
       <div className="flex items-center gap-3 rounded-2xl bg-surface p-4">
         {poster ? (
-          <img src={poster} alt={bracket.suggestionA.title} className="w-10 h-14 object-cover rounded-lg shrink-0" />
+          <img
+            src={poster}
+            alt={bracket.suggestionA.title}
+            className="w-10 h-14 object-cover rounded-lg shrink-0"
+          />
         ) : (
           <div className="w-10 h-14 rounded-lg bg-white/10 shrink-0" />
         )}

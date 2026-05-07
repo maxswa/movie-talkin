@@ -1,10 +1,10 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { PartyListItem } from "../components/PartyListItem";
-import { useMe } from "../hooks/useMe";
-import { api } from "../lib/api";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { PartyListItem } from '../components/PartyListItem';
+import { useMe } from '../hooks/useMe';
+import { api } from '../lib/api';
 
-export const Route = createFileRoute("/parties/")({
+export const Route = createFileRoute('/parties/')({
   component: PartiesPage,
 });
 
@@ -14,7 +14,7 @@ function PartiesPage() {
   const navigate = useNavigate();
 
   const { data: parties = [], isLoading } = useQuery({
-    queryKey: ["parties", group?.id],
+    queryKey: ['parties', group?.id],
     queryFn: () => api.parties.list(group!.id),
     enabled: !!group,
   });
@@ -22,8 +22,8 @@ function PartiesPage() {
   const createMutation = useMutation({
     mutationFn: () => api.parties.create(group!.id),
     onSuccess: (newParty) => {
-      queryClient.invalidateQueries({ queryKey: ["parties", group?.id] });
-      navigate({ to: "/parties/$partyId", params: { partyId: newParty.id } });
+      queryClient.invalidateQueries({ queryKey: ['parties', group?.id] });
+      navigate({ to: '/parties/$partyId', params: { partyId: newParty.id } });
     },
   });
 
@@ -40,13 +40,11 @@ function PartiesPage() {
           disabled={createMutation.isPending}
           className="rounded-xl bg-accent-purple px-4 py-2 text-sm font-medium disabled:opacity-40 transition-opacity"
         >
-          {createMutation.isPending ? "Creating…" : "New party"}
+          {createMutation.isPending ? 'Creating…' : 'New party'}
         </button>
       </div>
 
-      {isLoading && (
-        <p className="text-center text-sm text-white/40 py-8">Loading…</p>
-      )}
+      {isLoading && <p className="text-center text-sm text-white/40 py-8">Loading…</p>}
 
       {!isLoading && sorted.length === 0 && (
         <p className="text-center text-sm text-white/40 py-8">No parties yet.</p>

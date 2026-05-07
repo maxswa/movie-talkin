@@ -3,6 +3,7 @@
 Mobile-first React app built with TanStack Router and React Query. The UI is status-driven — the home screen changes based on the current watch party's lifecycle stage. Guests see a focused single-screen experience; hosts get additional management screens via a bottom nav.
 
 **Key assumptions for v1**
+
 - A user belongs to exactly one group — no group switcher needed
 - The "active party" is the most recent non-`watched` party in that group
 - Unauthenticated users see a "Check your magic link" prompt rather than a redirect
@@ -35,6 +36,7 @@ Mobile-first React app built with TanStack Router and React Query. The UI is sta
 Shared chrome and data-fetching wiring before any feature screens.
 
 **Tasks:**
+
 - Configure Tailwind with the palette above as custom color tokens
 - Replace the root layout with a mobile-first shell: full viewport height, scrollable content area, fixed bottom nav
 - Bottom nav is only shown to authenticated users. Tabs differ by role:
@@ -52,16 +54,16 @@ The main screen for all users. Loads the user's group, then the active party, an
 
 **Route:** `/`
 
-| Status | What the user sees |
-|--------|--------------------|
-| *(no active party)* | "No upcoming party yet" placeholder |
-| `draft` | Party date if set, "Your host is planning the next party…" |
-| `open_for_category_suggestions` | → step 3 |
-| `category_suggestions_closed` | Selected category pill, "Movie suggestions opening soon" |
-| `open_for_movie_suggestions` | → step 4 |
-| `movie_suggestions_closed` | Submitted movie list, "Voting coming soon" |
-| `voting` | → step 5 |
-| `movie_selected` | Winning movie poster + title + party date |
+| Status                          | What the user sees                                         |
+| ------------------------------- | ---------------------------------------------------------- |
+| _(no active party)_             | "No upcoming party yet" placeholder                        |
+| `draft`                         | Party date if set, "Your host is planning the next party…" |
+| `open_for_category_suggestions` | → step 3                                                   |
+| `category_suggestions_closed`   | Selected category pill, "Movie suggestions opening soon"   |
+| `open_for_movie_suggestions`    | → step 4                                                   |
+| `movie_suggestions_closed`      | Submitted movie list, "Voting coming soon"                 |
+| `voting`                        | → step 5                                                   |
+| `movie_selected`                | Winning movie poster + title + party date                  |
 
 A status badge and the scheduled date (if set) are pinned to the top of every state.
 
@@ -82,11 +84,13 @@ Rendered inline on `/` when status is `open_for_category_suggestions`.
 Rendered inline on `/` when status is `open_for_movie_suggestions`.
 
 **Inline on `/`:**
+
 - List of submitted suggestions: poster thumbnail, title, release year, suggester name
 - "Suggest a movie" button → navigates to `/search`
 - If the current user has already submitted a suggestion, their entry is highlighted and the button is hidden
 
 **Route:** `/search`
+
 - Debounced search input calling `GET /tmdb/search?q=`
 - Results render below as a scrollable list: poster, title, release year
 - Tapping a result submits `POST /parties/:partyId/movie-suggestions` then navigates back to `/`
@@ -111,11 +115,13 @@ Rendered inline on `/` when status is `voting`.
 Host-only screens for creating and managing parties.
 
 **Route:** `/parties`
+
 - List of all parties for the group, newest first
 - Each row: status badge, scheduled date
 - "New party" button → `POST /groups/:groupId/parties` → navigates to the new party's detail page
 
 **Route:** `/parties/$partyId`
+
 - Date/time picker for `scheduledFor` (auto-saves on blur)
 - Current status badge
 - "Advance to next stage" button
@@ -129,6 +135,7 @@ Host-only screens for creating and managing parties.
 Host-only screen for managing group members.
 
 **Route:** `/users`
+
 - List of current group members with name and role badge
 - "Add member" form: name (required) + email (optional) → `POST /users` → displays the returned magic link with a one-tap copy button
 - "Get magic link" per existing member → `POST /users/:id/magic-link` → displays the link inline with a copy button

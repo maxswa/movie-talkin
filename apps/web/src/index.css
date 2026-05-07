@@ -1,13 +1,13 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
-  --color-deep: #30292F;
-  --color-surface: #413F54;
-  --color-accent-purple: #5F5AA2;
+  --color-deep: #30292f;
+  --color-surface: #413f54;
+  --color-accent-purple: #5f5aa2;
   --color-accent-blue: #355691;
-  --color-neutral: #3F4045;
+  --color-neutral: #3f4045;
 }
 
 body {
-  background-color: #30292F;
+  background-color: #30292f;
 }

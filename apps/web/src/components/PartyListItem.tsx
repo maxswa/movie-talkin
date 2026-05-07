@@ -1,7 +1,7 @@
-import { Link } from "@tanstack/react-router";
-import type { WatchParty } from "../lib/api";
-import { formatDate } from "../lib/utils";
-import { StatusBadge } from "./StatusBadge";
+import { Link } from '@tanstack/react-router';
+import type { WatchParty } from '../lib/api';
+import { formatDate } from '../lib/utils';
+import { StatusBadge } from './StatusBadge';
 
 export function PartyListItem({ party }: { party: WatchParty }) {
   return (
@@ -12,13 +12,11 @@ export function PartyListItem({ party }: { party: WatchParty }) {
     >
       <div className="flex flex-col gap-1">
         <div className="flex gap-2">
-          <span>{party.selectedCategory ?? "TBD"}</span>
+          <span>{party.selectedCategory ?? 'TBD'}</span>
           <StatusBadge status={party.status} />
         </div>
         {party.scheduledFor && (
-          <span className="text-xs text-white/40">
-            {formatDate(party.scheduledFor)}
-          </span>
+          <span className="text-xs text-white/40">{formatDate(party.scheduledFor)}</span>
         )}
       </div>
       <svg

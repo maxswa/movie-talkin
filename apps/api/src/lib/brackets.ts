@@ -1,5 +1,9 @@
 export type WinnerInfo = { id: string; margin: number; wasBye: boolean };
-export type BracketPairing = { suggestionAId: string; suggestionBId: string; winnerId: string | null };
+export type BracketPairing = {
+  suggestionAId: string;
+  suggestionBId: string;
+  winnerId: string | null;
+};
 
 export function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -11,7 +15,8 @@ export function shuffle<T>(arr: T[]): T[] {
 }
 
 export function buildRoundOnePairings(suggestionIds: string[]): BracketPairing[] {
-  if (suggestionIds.length < 2) throw new Error("Need at least 2 movie suggestions to start voting");
+  if (suggestionIds.length < 2)
+    throw new Error('Need at least 2 movie suggestions to start voting');
 
   const shuffled = shuffle([...suggestionIds]);
   const pairings: BracketPairing[] = [];
@@ -41,7 +46,11 @@ export function buildNextRoundPairings(winners: WinnerInfo[]): BracketPairing[] 
     for (let i = 0; i < rest.length; i += 2) {
       pairings.push({ suggestionAId: rest[i], suggestionBId: rest[i + 1], winnerId: null });
     }
-    pairings.push({ suggestionAId: byeWinner.id, suggestionBId: byeWinner.id, winnerId: byeWinner.id });
+    pairings.push({
+      suggestionAId: byeWinner.id,
+      suggestionBId: byeWinner.id,
+      winnerId: byeWinner.id,
+    });
   } else {
     const shuffled = shuffle(winners.map((w) => w.id));
     for (let i = 0; i < shuffled.length; i += 2) {

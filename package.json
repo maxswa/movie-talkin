@@ -6,6 +6,7 @@
     "dev:api": "pnpm --filter @movie-talkin/api dev",
     "dev:web": "pnpm --filter @movie-talkin/web dev",
     "build": "pnpm --filter './packages/*' build && pnpm --filter './apps/*' build",
+    "test:api": "pnpm --filter @movie-talkin/api test",
     "typecheck": "pnpm -r typecheck",
     "db:generate": "pnpm --filter @movie-talkin/api db:generate",
     "db:migrate": "pnpm --filter @movie-talkin/api db:migrate",

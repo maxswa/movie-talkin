@@ -4,6 +4,7 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { authRouter } from "./routes/auth.js";
+import { bracketsRouter } from "./routes/brackets.js";
 import { groupsRouter } from "./routes/groups.js";
 import { partiesRouter } from "./routes/parties.js";
 import { tmdbRouter } from "./routes/tmdb.js";
@@ -26,6 +27,7 @@ app.route("/auth", authRouter);
 app.route("/users", usersRouter);
 app.route("/groups", groupsRouter);
 app.route("/parties", partiesRouter);
+app.route("/brackets", bracketsRouter);
 app.route("/tmdb", tmdbRouter);
 
 app.doc("/doc", {

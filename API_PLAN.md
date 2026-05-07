@@ -21,7 +21,7 @@ Routes are grouped by resource. Each section lists the endpoints, who can call t
 - [x] 5. Category suggestions
 - [x] 6. TMDB search proxy
 - [x] 7. Movie suggestions
-- [ ] 8. Brackets & voting
+- [x] 8. Brackets & voting
 
 ---
 

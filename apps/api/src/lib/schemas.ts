@@ -80,3 +80,19 @@ export const CategorySuggestionSchema = z.object({
   name: z.string(),
   createdAt: z.string(),
 });
+
+export const BracketSchema = z.object({
+  id: z.string(),
+  round: z.number(),
+  suggestionA: MovieSuggestionSchema,
+  suggestionB: MovieSuggestionSchema,
+  voteCountA: z.number(),
+  voteCountB: z.number(),
+  myVote: z.string().nullable(),
+  winnerId: z.string().nullable(),
+});
+
+export const BracketRoundSchema = z.object({
+  round: z.number(),
+  brackets: z.array(BracketSchema),
+});

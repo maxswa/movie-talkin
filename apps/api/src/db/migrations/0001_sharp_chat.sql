@@ -1,0 +1,1 @@
+ALTER TABLE `brackets` ADD `round_ends_at` text;

@@ -99,6 +99,7 @@ export const brackets = sqliteTable('brackets', {
     .notNull()
     .references(() => movieSuggestions.id),
   winnerId: text('winner_id').references(() => movieSuggestions.id),
+  roundEndsAt: text('round_ends_at'),
   createdAt: now().notNull(),
 });
 

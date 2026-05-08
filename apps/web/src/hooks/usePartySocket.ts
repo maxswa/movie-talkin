@@ -20,6 +20,12 @@ export function usePartySocket(partyId: string) {
           ['category-spin', partyId],
           event as CategorySpinPayload,
         );
+      } else if (event.type === 'round_closed') {
+        queryClient.invalidateQueries({ queryKey: ['brackets', partyId] });
+        queryClient.invalidateQueries({ queryKey: ['party', partyId] });
+        queryClient.invalidateQueries({ queryKey: ['parties'] });
+      } else if (event.type === 'round_deadline_changed') {
+        queryClient.invalidateQueries({ queryKey: ['brackets', partyId] });
       }
     };
 

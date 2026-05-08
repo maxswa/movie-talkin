@@ -109,6 +109,7 @@ export interface Bracket {
   voteCountB: number;
   myVote: string | null;
   winnerId: string | null;
+  roundEndsAt: string | null;
 }
 
 export interface BracketRound {
@@ -176,7 +177,10 @@ export const api = {
         method: 'PATCH',
         body: JSON.stringify(body),
       }),
-    advance: (partyId: string, body: { selectedCategory?: string } = {}) =>
+    advance: (
+      partyId: string,
+      body: { selectedCategory?: string; durationMs?: number } = {},
+    ) =>
       request<WatchParty>(`/parties/${partyId}/advance`, {
         method: 'POST',
         body: JSON.stringify(body),
@@ -217,7 +221,15 @@ export const api = {
         method: 'POST',
         body: JSON.stringify({ suggestionId }),
       }),
-    closeRound: (partyId: string) =>
-      request<WatchParty>(`/parties/${partyId}/brackets/close-round`, { method: 'POST' }),
+    closeRound: (partyId: string, body: { durationMs?: number } = {}) =>
+      request<WatchParty>(`/parties/${partyId}/brackets/close-round`, {
+        method: 'POST',
+        body: JSON.stringify(body),
+      }),
+    setRoundDeadline: (partyId: string, endsAt: string | null) =>
+      request<{ ok: boolean }>(`/parties/${partyId}/round-deadline`, {
+        method: 'PATCH',
+        body: JSON.stringify({ endsAt }),
+      }),
   },
 };

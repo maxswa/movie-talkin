@@ -6,10 +6,11 @@ import { BracketTree } from '../components/BracketTree';
 import { CategoryHistory } from '../components/CategoryHistory';
 import { MemberList } from '../components/MemberList';
 import { PartyBody } from '../components/PartyBody';
+import { RoundCountdown } from '../components/RoundCountdown';
 import { StatusBadge } from '../components/StatusBadge';
 import { useMe } from '../hooks/useMe';
 import { usePartySocket } from '../hooks/usePartySocket';
-import { api, type WatchParty } from '../lib/api';
+import { api, type WatchPartyDetail } from '../lib/api';
 import { formatDate, toLocalInputValue } from '../lib/utils';
 
 export const Route = createFileRoute('/party/$partyId')({
@@ -33,19 +34,45 @@ function PartyDetailPage() {
     queryFn: () => api.brackets.list(partyId),
   });
 
+  const currentRoundNumber = rounds.length > 0 ? Math.max(...rounds.map((r) => r.round)) : null;
+  const currentEndsAt =
+    currentRoundNumber != null
+      ? rounds
+          .find((r) => r.round === currentRoundNumber)
+          ?.brackets.find((b) => b.roundEndsAt)?.roundEndsAt ?? null
+      : null;
+
   const updateMutation = useMutation({
     mutationFn: (scheduledFor: string | null) => api.parties.update(partyId, { scheduledFor }),
+    onMutate: (scheduledFor) => {
+      const previous = queryClient.getQueryData<WatchPartyDetail>(['party', partyId]);
+      queryClient.setQueryData<WatchPartyDetail>(['party', partyId], (old) =>
+        old ? { ...old, scheduledFor } : old,
+      );
+      return { previous };
+    },
+    onError: (_err, _scheduledFor, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(['party', partyId], context.previous);
+      }
+    },
     onSuccess: (updated) => {
-      queryClient.setQueryData<WatchParty>(['party', partyId], (old) =>
-        old ? { ...old, ...updated } : updated,
+      queryClient.setQueryData<WatchPartyDetail>(['party', partyId], (old) =>
+        old ? { ...old, ...updated } : old,
       );
       queryClient.invalidateQueries({ queryKey: ['parties'] });
     },
   });
 
-  function handleDateBlur(e: React.FocusEvent<HTMLInputElement>) {
+  function handleDateChange(e: React.ChangeEvent<HTMLInputElement>) {
     const value = e.target.value;
-    updateMutation.mutate(value ? new Date(value).toISOString() : null);
+    if (!value) {
+      updateMutation.mutate(null);
+      return;
+    }
+    const date = new Date(value);
+    if (isNaN(date.getTime())) return;
+    updateMutation.mutate(date.toISOString());
   }
 
   if (isLoading || !party) {
@@ -84,9 +111,10 @@ function PartyDetailPage() {
         </h1>
         {isHost ? (
           <input
+            key={party.scheduledFor ?? 'empty'}
             type="datetime-local"
             defaultValue={toLocalInputValue(party.scheduledFor)}
-            onBlur={handleDateBlur}
+            onChange={handleDateChange}
             className="rounded-xl bg-white/10 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-accent-purple/50 [color-scheme:dark]"
           />
         ) : (
@@ -94,6 +122,7 @@ function PartyDetailPage() {
             <p className="text-sm text-white/50">📅 {formatDate(party.scheduledFor)}</p>
           )
         )}
+        {party.status === 'voting' && currentEndsAt && <RoundCountdown endsAt={currentEndsAt} />}
       </header>
 
       {isHost && (

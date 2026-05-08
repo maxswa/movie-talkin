@@ -24,6 +24,11 @@ import {
 import { buildNextRoundPairings, buildRoundOnePairings, type WinnerInfo } from '../lib/brackets.js';
 import { requireAuth } from '../middleware/auth.js';
 import { broadcast } from '../lib/pubsub.js';
+import {
+  cancelAutoClose,
+  registerCloseRound,
+  scheduleAutoClose,
+} from '../lib/round-scheduler.js';
 import type { AppEnv } from '../lib/types.js';
 
 const PartyIdParam = z.object({ partyId: z.string() });
@@ -64,6 +69,107 @@ async function generateRoundOneBrackets(partyId: string) {
     .insert(brackets)
     .values(pairings.map((p) => ({ watchPartyId: partyId, round: 1, ...p })));
 }
+
+async function applyRoundDeadline(partyId: string, round: number, durationMs: number | null) {
+  if (!durationMs || durationMs <= 0) return;
+  const deadline = new Date(Date.now() + durationMs);
+  await db
+    .update(brackets)
+    .set({ roundEndsAt: deadline.toISOString() })
+    .where(and(eq(brackets.watchPartyId, partyId), eq(brackets.round, round)));
+  scheduleAutoClose(partyId, deadline);
+}
+
+type CloseRoundResult =
+  | { ok: false; error: string }
+  | { ok: true; party: typeof watchParties.$inferSelect };
+
+async function performCloseRound(
+  partyId: string,
+  opts: { nextDurationMs: number | null } = { nextDurationMs: null },
+): Promise<CloseRoundResult> {
+  cancelAutoClose(partyId);
+
+  const allBrackets = await db.query.brackets.findMany({
+    where: eq(brackets.watchPartyId, partyId),
+  });
+  if (allBrackets.length === 0) return { ok: false, error: 'No brackets found' };
+
+  const currentRound = Math.max(...allBrackets.map((b) => b.round));
+  const roundBrackets = allBrackets.filter((b) => b.round === currentRound);
+  const openBrackets = roundBrackets.filter((b) => b.winnerId === null);
+  if (openBrackets.length === 0) return { ok: false, error: 'Current round is already closed' };
+
+  const openBracketIds = openBrackets.map((b) => b.id);
+
+  const votes = await db
+    .select({
+      bracketId: movieVotes.bracketId,
+      votedFor: movieVotes.votedFor,
+      tally: count(),
+    })
+    .from(movieVotes)
+    .where(inArray(movieVotes.bracketId, openBracketIds))
+    .groupBy(movieVotes.bracketId, movieVotes.votedFor);
+
+  const voteMap = new Map<string, Map<string, number>>();
+  for (const v of votes) {
+    if (!voteMap.has(v.bracketId)) voteMap.set(v.bracketId, new Map());
+    voteMap.get(v.bracketId)!.set(v.votedFor, v.tally);
+  }
+
+  const winners: WinnerInfo[] = roundBrackets
+    .filter((b) => b.winnerId !== null)
+    .map((b) => ({ id: b.winnerId!, margin: Infinity, wasBye: true }));
+
+  for (const bracket of openBrackets) {
+    const counts = voteMap.get(bracket.id) ?? new Map();
+    const countA = counts.get(bracket.suggestionAId) ?? 0;
+    const countB = counts.get(bracket.suggestionBId) ?? 0;
+    const winnerId = countA >= countB ? bracket.suggestionAId : bracket.suggestionBId;
+    const margin = Math.abs(countA - countB);
+
+    await db.update(brackets).set({ winnerId }).where(eq(brackets.id, bracket.id));
+    winners.push({ id: winnerId, margin, wasBye: false });
+  }
+
+  let [updated] = await db.query.watchParties.findMany({
+    where: eq(watchParties.id, partyId),
+  });
+
+  if (winners.length === 1) {
+    [updated] = await db
+      .update(watchParties)
+      .set({ status: 'movie_selected', winningSuggestionId: winners[0].id })
+      .where(eq(watchParties.id, partyId))
+      .returning();
+  } else {
+    const nextRound = currentRound + 1;
+    const pairings = buildNextRoundPairings(winners);
+    await db
+      .insert(brackets)
+      .values(pairings.map((p) => ({ watchPartyId: partyId, round: nextRound, ...p })));
+    await applyRoundDeadline(partyId, nextRound, opts.nextDurationMs);
+  }
+
+  broadcast(partyId, { type: 'round_closed' });
+
+  return { ok: true, party: updated };
+}
+
+registerCloseRound(async (partyId) => {
+  const allBrackets = await db.query.brackets.findMany({
+    where: eq(brackets.watchPartyId, partyId),
+  });
+  if (allBrackets.length === 0) return;
+  const currentRound = Math.max(...allBrackets.map((b) => b.round));
+  const sample = allBrackets.find((b) => b.round === currentRound && b.roundEndsAt);
+  let nextDurationMs: number | null = null;
+  if (sample?.roundEndsAt) {
+    nextDurationMs = new Date(sample.roundEndsAt).getTime() - new Date(sample.createdAt).getTime();
+  }
+  await performCloseRound(partyId, { nextDurationMs });
+});
 
 // ---------------------------------------------------------------------------
 // Router
@@ -223,6 +329,7 @@ partiesRouter.openapi(
           'application/json': {
             schema: z.object({
               selectedCategory: z.string().optional(),
+              durationMs: z.number().int().positive().optional(),
             }),
           },
         },
@@ -284,6 +391,9 @@ partiesRouter.openapi(
         await generateRoundOneBrackets(partyId);
       } catch (e) {
         return c.json({ error: (e as Error).message }, 400);
+      }
+      if (body.durationMs && body.durationMs > 0) {
+        await applyRoundDeadline(partyId, 1, body.durationMs);
       }
     }
 
@@ -695,6 +805,7 @@ partiesRouter.openapi(
         voteCountB: counts.get(bracket.suggestionBId) ?? 0,
         myVote: myVoteMap.get(bracket.id) ?? null,
         winnerId: bracket.winnerId,
+        roundEndsAt: bracket.roundEndsAt ?? null,
       };
 
       if (!roundMap.has(bracket.round)) roundMap.set(bracket.round, []);
@@ -766,6 +877,81 @@ partiesRouter.openapi(
       .where(eq(movieVotes.bracketId, bracketId));
 
     return c.json(rows, 200);
+  },
+);
+
+// ---------------------------------------------------------------------------
+// PATCH /parties/:partyId/round-deadline (host only, voting)
+// ---------------------------------------------------------------------------
+
+partiesRouter.openapi(
+  createRoute({
+    method: 'patch',
+    path: '/{partyId}/round-deadline',
+    tags: ['Brackets'],
+    summary: 'Update or clear the current round deadline (host only, party in voting)',
+    middleware: [requireAuth],
+    request: {
+      params: PartyIdParam,
+      body: {
+        content: {
+          'application/json': {
+            schema: z.object({ endsAt: z.string().nullable() }),
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        content: { 'application/json': { schema: z.object({ ok: z.boolean() }) } },
+        description: 'Deadline updated',
+      },
+      400: {
+        content: { 'application/json': { schema: ErrorSchema } },
+        description: 'Party not in voting status',
+      },
+      401: {
+        content: { 'application/json': { schema: ErrorSchema } },
+        description: 'Not authenticated',
+      },
+      403: {
+        content: { 'application/json': { schema: ErrorSchema } },
+        description: 'Not a host',
+      },
+      404: {
+        content: { 'application/json': { schema: ErrorSchema } },
+        description: 'Party not found',
+      },
+    },
+  }),
+  async (c) => {
+    const { partyId } = c.req.valid('param');
+    const { endsAt } = c.req.valid('json');
+    const user = c.get('user');
+
+    const { party, member } = await getPartyAndMembership(partyId, user.id);
+    if (!party) return c.json({ error: 'Party not found' }, 404);
+    if (!member || member.role !== 'host') return c.json({ error: 'Forbidden' }, 403);
+    if (party.status !== 'voting')
+      return c.json({ error: 'Party is not currently in voting status' }, 400);
+
+    const allBrackets = await db.query.brackets.findMany({
+      where: eq(brackets.watchPartyId, partyId),
+    });
+    if (allBrackets.length === 0) return c.json({ error: 'No brackets found' }, 400);
+    const currentRound = Math.max(...allBrackets.map((b) => b.round));
+
+    await db
+      .update(brackets)
+      .set({ roundEndsAt: endsAt })
+      .where(and(eq(brackets.watchPartyId, partyId), eq(brackets.round, currentRound)));
+
+    cancelAutoClose(partyId);
+    if (endsAt) scheduleAutoClose(partyId, new Date(endsAt));
+
+    broadcast(partyId, { type: 'round_deadline_changed' });
+
+    return c.json({ ok: true }, 200);
   },
 );
 
@@ -853,7 +1039,16 @@ partiesRouter.openapi(
     tags: ['Brackets'],
     summary: 'Close the current voting round, tally votes, advance or finalise (host only)',
     middleware: [requireAuth],
-    request: { params: PartyIdParam },
+    request: {
+      params: PartyIdParam,
+      body: {
+        content: {
+          'application/json': {
+            schema: z.object({ durationMs: z.number().int().positive().optional() }).optional(),
+          },
+        },
+      },
+    },
     responses: {
       200: {
         content: { 'application/json': { schema: WatchPartySchema } },
@@ -880,6 +1075,7 @@ partiesRouter.openapi(
   async (c) => {
     const { partyId } = c.req.valid('param');
     const user = c.get('user');
+    const body = c.req.valid('json') ?? {};
 
     const { party, member } = await getPartyAndMembership(partyId, user.id);
     if (!party) return c.json({ error: 'Party not found' }, 404);
@@ -887,75 +1083,11 @@ partiesRouter.openapi(
     if (party.status !== 'voting')
       return c.json({ error: 'Party is not currently in voting status' }, 400);
 
-    const allBrackets = await db.query.brackets.findMany({
-      where: eq(brackets.watchPartyId, partyId),
+    const result = await performCloseRound(partyId, {
+      nextDurationMs: body.durationMs ?? null,
     });
 
-    if (allBrackets.length === 0) return c.json({ error: 'No brackets found' }, 400);
-
-    const currentRound = Math.max(...allBrackets.map((b) => b.round));
-    const roundBrackets = allBrackets.filter((b) => b.round === currentRound);
-    const openBrackets = roundBrackets.filter((b) => b.winnerId === null);
-
-    if (openBrackets.length === 0) return c.json({ error: 'Current round is already closed' }, 400);
-
-    const openBracketIds = openBrackets.map((b) => b.id);
-
-    const votes = await db
-      .select({
-        bracketId: movieVotes.bracketId,
-        votedFor: movieVotes.votedFor,
-        tally: count(),
-      })
-      .from(movieVotes)
-      .where(inArray(movieVotes.bracketId, openBracketIds))
-      .groupBy(movieVotes.bracketId, movieVotes.votedFor);
-
-    const voteMap = new Map<string, Map<string, number>>();
-    for (const v of votes) {
-      if (!voteMap.has(v.bracketId)) voteMap.set(v.bracketId, new Map());
-      voteMap.get(v.bracketId)!.set(v.votedFor, v.tally);
-    }
-
-    // Carry forward pre-resolved bye brackets, then resolve open brackets.
-    // Track margin and bye status so we can assign the next bye fairly.
-    const winners: WinnerInfo[] = roundBrackets
-      .filter((b) => b.winnerId !== null)
-      .map((b) => ({ id: b.winnerId!, margin: Infinity, wasBye: true }));
-
-    for (const bracket of openBrackets) {
-      const counts = voteMap.get(bracket.id) ?? new Map();
-      const countA = counts.get(bracket.suggestionAId) ?? 0;
-      const countB = counts.get(bracket.suggestionBId) ?? 0;
-      const winnerId = countA >= countB ? bracket.suggestionAId : bracket.suggestionBId;
-      const margin = Math.abs(countA - countB);
-
-      await db.update(brackets).set({ winnerId }).where(eq(brackets.id, bracket.id));
-      winners.push({ id: winnerId, margin, wasBye: false });
-    }
-
-    let [updated] = await db.query.watchParties.findMany({
-      where: eq(watchParties.id, partyId),
-    });
-
-    if (winners.length === 1) {
-      [updated] = await db
-        .update(watchParties)
-        .set({ status: 'movie_selected', winningSuggestionId: winners[0].id })
-        .where(eq(watchParties.id, partyId))
-        .returning();
-    } else {
-      const nextRound = currentRound + 1;
-      const pairings = buildNextRoundPairings(winners);
-      await db.insert(brackets).values(
-        pairings.map((p) => ({
-          watchPartyId: partyId,
-          round: nextRound,
-          ...p,
-        })),
-      );
-    }
-
-    return c.json({ ...updated, status: updated.status as WatchPartyStatus }, 200);
+    if (!result.ok) return c.json({ error: result.error }, 400);
+    return c.json({ ...result.party, status: result.party.status as WatchPartyStatus }, 200);
   },
 );

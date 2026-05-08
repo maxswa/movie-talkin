@@ -90,6 +90,7 @@ export const BracketSchema = z.object({
   voteCountB: z.number(),
   myVote: z.string().nullable(),
   winnerId: z.string().nullable(),
+  roundEndsAt: z.string().nullable(),
 });
 
 export const BracketRoundSchema = z.object({

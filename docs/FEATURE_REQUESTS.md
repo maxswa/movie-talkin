@@ -8,7 +8,7 @@
 - [x] 1 — Clickable detail view + bracket graphic + category history
 - [x] 5 — Host vote breakdowns
 - [x] 4 — Category spinner
-- [ ] 2 — Round auto-advance timer
+- [x] 2 — Round auto-advance timer
 - [ ] 6 — Does the dog die
 
 ---

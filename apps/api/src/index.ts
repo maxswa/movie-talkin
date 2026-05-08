@@ -5,6 +5,7 @@ import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
 import { WebSocketServer } from 'ws';
 import { subscribe } from './lib/pubsub.js';
+import { restoreSchedules } from './lib/round-scheduler.js';
 import { authRouter } from './routes/auth.js';
 import { bracketsRouter } from './routes/brackets.js';
 import { groupsRouter } from './routes/groups.js';
@@ -66,4 +67,8 @@ const wss = new WebSocketServer({ noServer: true });
 serve({ fetch: app.fetch, port, websocket: { server: wss } }, () => {
   console.log(`API running on http://localhost:${port}`);
   console.log(`Swagger UI at http://localhost:${port}/ui`);
+});
+
+restoreSchedules().catch((err) => {
+  console.error('Failed to restore round timers:', err);
 });

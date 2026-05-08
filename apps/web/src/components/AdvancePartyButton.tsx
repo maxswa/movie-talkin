@@ -1,11 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
 import { api, WatchParty } from '../lib/api';
 import { nextStatus } from '../lib/utils';
+import { RoundDeadlinePicker } from './RoundDeadlinePicker';
 import { STATUS_META } from './StatusBadge';
 
 export function AdvancePartyButton({ party }: { party: WatchParty }) {
   const queryClient = useQueryClient();
   const isCategoryPhase = party.status === 'open_for_category_suggestions';
+  const isStartingVote = party.status === 'movie_suggestions_closed';
+  const [deadline, setDeadline] = useState<Date | null>(null);
 
   const { data: categorySuggestions = [] } = useQuery({
     queryKey: ['category-suggestions', party.id],
@@ -14,10 +18,17 @@ export function AdvancePartyButton({ party }: { party: WatchParty }) {
   });
 
   const advanceMutation = useMutation({
-    mutationFn: () => api.parties.advance(party.id),
+    mutationFn: () => {
+      if (isStartingVote && deadline) {
+        const durationMs = deadline.getTime() - Date.now();
+        if (durationMs > 0) return api.parties.advance(party.id, { durationMs });
+      }
+      return api.parties.advance(party.id);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['parties'] });
       queryClient.invalidateQueries({ queryKey: ['party', party.id] });
+      queryClient.invalidateQueries({ queryKey: ['brackets', party.id] });
     },
   });
 
@@ -55,6 +66,10 @@ export function AdvancePartyButton({ party }: { party: WatchParty }) {
 
   return (
     <div className="flex flex-col gap-3">
+      {isStartingVote && (
+        <RoundDeadlinePicker value={deadline} onChange={setDeadline} />
+      )}
+
       <button
         onClick={() => advanceMutation.mutate()}
         disabled={advanceMutation.isPending}

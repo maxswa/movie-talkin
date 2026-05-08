@@ -6,7 +6,7 @@
 
 - [x] 3 — Only show own movie suggestion (quick win, no deps)
 - [x] 1 — Clickable detail view + bracket graphic + category history
-- [ ] 5 — Host vote breakdowns
+- [x] 5 — Host vote breakdowns
 - [ ] 4 — Category spinner
 - [ ] 2 — Round auto-advance timer
 - [ ] 6 — Does the dog die

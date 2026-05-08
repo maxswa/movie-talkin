@@ -116,6 +116,12 @@ export interface BracketRound {
   brackets: Bracket[];
 }
 
+export interface BracketVote {
+  userId: string;
+  name: string;
+  votedFor: string;
+}
+
 export function tmdbImageUrl(path: string | null, size = 'w342'): string | null {
   if (!path) return null;
   return `https://image.tmdb.org/t/p/${size}${path}`;
@@ -196,6 +202,8 @@ export const api = {
 
   brackets: {
     list: (partyId: string) => request<BracketRound[]>(`/parties/${partyId}/brackets`),
+    votes: (partyId: string, bracketId: string) =>
+      request<BracketVote[]>(`/parties/${partyId}/brackets/${bracketId}/votes`),
     vote: (bracketId: string, suggestionId: string) =>
       request<{ ok: boolean }>(`/brackets/${bracketId}/vote`, {
         method: 'POST',

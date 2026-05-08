@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createFileRoute, useRouter } from '@tanstack/react-router';
 import { AdvancePartyButton } from '../components/AdvancePartyButton';
+import { BracketBreakdowns } from '../components/BracketBreakdowns';
 import { BracketTree } from '../components/BracketTree';
 import { CategoryHistory } from '../components/CategoryHistory';
 import { MemberList } from '../components/MemberList';
@@ -112,6 +113,15 @@ function PartyDetailPage() {
         <section className="flex flex-col gap-3">
           <h2 className="text-sm font-semibold text-white/60 uppercase tracking-wide">Bracket</h2>
           <BracketTree rounds={rounds} />
+        </section>
+      )}
+
+      {isHost && rounds.length > 0 && party.status !== 'voting' && (
+        <section className="flex flex-col gap-3">
+          <h2 className="text-sm font-semibold text-white/60 uppercase tracking-wide">
+            Vote breakdowns
+          </h2>
+          <BracketBreakdowns partyId={partyId} rounds={rounds} />
         </section>
       )}
 

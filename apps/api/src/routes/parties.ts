@@ -12,6 +12,7 @@ import {
 } from '../db/schema.js';
 import {
   BracketRoundSchema,
+  BracketVoteSchema,
   CategorySuggestionSchema,
   ErrorSchema,
   MovieSuggestionSchema,
@@ -705,6 +706,66 @@ partiesRouter.openapi(
       .map(([round, bs]) => ({ round, brackets: bs }));
 
     return c.json(rounds, 200);
+  },
+);
+
+// ---------------------------------------------------------------------------
+// GET /parties/:partyId/brackets/:bracketId/votes (host only)
+// ---------------------------------------------------------------------------
+
+partiesRouter.openapi(
+  createRoute({
+    method: 'get',
+    path: '/{partyId}/brackets/{bracketId}/votes',
+    tags: ['Brackets'],
+    summary: 'Per-user vote breakdown for a single bracket (host only)',
+    middleware: [requireAuth],
+    request: {
+      params: z.object({ partyId: z.string(), bracketId: z.string() }),
+    },
+    responses: {
+      200: {
+        content: { 'application/json': { schema: z.array(BracketVoteSchema) } },
+        description: 'Vote breakdown',
+      },
+      401: {
+        content: { 'application/json': { schema: ErrorSchema } },
+        description: 'Not authenticated',
+      },
+      403: {
+        content: { 'application/json': { schema: ErrorSchema } },
+        description: 'Not a host',
+      },
+      404: {
+        content: { 'application/json': { schema: ErrorSchema } },
+        description: 'Bracket not found',
+      },
+    },
+  }),
+  async (c) => {
+    const { partyId, bracketId } = c.req.valid('param');
+    const user = c.get('user');
+
+    const { party, member } = await getPartyAndMembership(partyId, user.id);
+    if (!party) return c.json({ error: 'Party not found' }, 404);
+    if (!member || member.role !== 'host') return c.json({ error: 'Forbidden' }, 403);
+
+    const bracket = await db.query.brackets.findFirst({
+      where: and(eq(brackets.id, bracketId), eq(brackets.watchPartyId, partyId)),
+    });
+    if (!bracket) return c.json({ error: 'Bracket not found' }, 404);
+
+    const rows = await db
+      .select({
+        userId: users.id,
+        name: users.name,
+        votedFor: movieVotes.votedFor,
+      })
+      .from(movieVotes)
+      .innerJoin(users, eq(movieVotes.userId, users.id))
+      .where(eq(movieVotes.bracketId, bracketId));
+
+    return c.json(rows, 200);
   },
 );
 

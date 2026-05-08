@@ -96,3 +96,9 @@ export const BracketRoundSchema = z.object({
   round: z.number(),
   brackets: z.array(BracketSchema),
 });
+
+export const BracketVoteSchema = z.object({
+  userId: z.string(),
+  name: z.string(),
+  votedFor: z.string(),
+});

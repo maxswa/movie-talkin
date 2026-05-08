@@ -1,6 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMe } from '../hooks/useMe';
 import { api, tmdbImageUrl, type Bracket } from '../lib/api';
 import { BracketMovieOption } from './BracketMovieOption';
+import { BracketVoteBreakdown } from './BracketVoteBreakdown';
 
 interface Props {
   bracket: Bracket;
@@ -10,7 +12,9 @@ interface Props {
 
 export function BracketMatch({ bracket, partyId, roundClosed }: Props) {
   const queryClient = useQueryClient();
+  const { isHost } = useMe();
   const isBye = bracket.suggestionA.id === bracket.suggestionB.id;
+  const showBreakdown = isHost && !isBye && bracket.winnerId !== null;
 
   const mutation = useMutation({
     mutationFn: (suggestionId: string) => api.brackets.vote(bracket.id, suggestionId),
@@ -65,6 +69,7 @@ export function BracketMatch({ bracket, partyId, roundClosed }: Props) {
           disabled={roundClosed || mutation.isPending}
         />
       </div>
+      {showBreakdown && <BracketVoteBreakdown partyId={partyId} bracket={bracket} />}
     </div>
   );
 }

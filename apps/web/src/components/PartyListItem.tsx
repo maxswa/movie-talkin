@@ -6,7 +6,7 @@ import { StatusBadge } from './StatusBadge';
 export function PartyListItem({ party }: { party: WatchParty }) {
   return (
     <Link
-      to="/parties/$partyId"
+      to="/party/$partyId"
       params={{ partyId: party.id }}
       className="flex items-center justify-between rounded-2xl bg-white/5 px-4 py-3 hover:bg-white/10 transition-colors"
     >

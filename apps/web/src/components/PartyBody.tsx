@@ -49,6 +49,7 @@ export function PartyBody({ party }: { party: WatchPartyDetail }) {
           <div className="text-center">
             <p className="font-semibold text-lg leading-snug">{movie.title}</p>
             {movie.releaseYear && <p className="text-white/40 text-sm">{movie.releaseYear}</p>}
+            <p className="text-white/50 text-xs mt-2">Suggested by {movie.suggestedBy.name}</p>
           </div>
         </div>
       );

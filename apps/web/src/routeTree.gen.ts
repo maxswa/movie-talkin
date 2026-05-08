@@ -14,7 +14,7 @@ import { Route as SearchRouteImport } from './routes/search'
 import { Route as PartiesRouteImport } from './routes/parties'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PartiesIndexRouteImport } from './routes/parties.index'
-import { Route as PartiesPartyIdRouteImport } from './routes/parties.$partyId'
+import { Route as PartyPartyIdRouteImport } from './routes/party.$partyId'
 import { Route as AuthVerifyRouteImport } from './routes/auth.verify'
 
 const UsersRoute = UsersRouteImport.update({
@@ -42,10 +42,10 @@ const PartiesIndexRoute = PartiesIndexRouteImport.update({
   path: '/',
   getParentRoute: () => PartiesRoute,
 } as any)
-const PartiesPartyIdRoute = PartiesPartyIdRouteImport.update({
-  id: '/$partyId',
-  path: '/$partyId',
-  getParentRoute: () => PartiesRoute,
+const PartyPartyIdRoute = PartyPartyIdRouteImport.update({
+  id: '/party/$partyId',
+  path: '/party/$partyId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthVerifyRoute = AuthVerifyRouteImport.update({
   id: '/auth/verify',
@@ -59,7 +59,7 @@ export interface FileRoutesByFullPath {
   '/search': typeof SearchRoute
   '/users': typeof UsersRoute
   '/auth/verify': typeof AuthVerifyRoute
-  '/parties/$partyId': typeof PartiesPartyIdRoute
+  '/party/$partyId': typeof PartyPartyIdRoute
   '/parties/': typeof PartiesIndexRoute
 }
 export interface FileRoutesByTo {
@@ -67,7 +67,7 @@ export interface FileRoutesByTo {
   '/search': typeof SearchRoute
   '/users': typeof UsersRoute
   '/auth/verify': typeof AuthVerifyRoute
-  '/parties/$partyId': typeof PartiesPartyIdRoute
+  '/party/$partyId': typeof PartyPartyIdRoute
   '/parties': typeof PartiesIndexRoute
 }
 export interface FileRoutesById {
@@ -77,7 +77,7 @@ export interface FileRoutesById {
   '/search': typeof SearchRoute
   '/users': typeof UsersRoute
   '/auth/verify': typeof AuthVerifyRoute
-  '/parties/$partyId': typeof PartiesPartyIdRoute
+  '/party/$partyId': typeof PartyPartyIdRoute
   '/parties/': typeof PartiesIndexRoute
 }
 export interface FileRouteTypes {
@@ -88,7 +88,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/users'
     | '/auth/verify'
-    | '/parties/$partyId'
+    | '/party/$partyId'
     | '/parties/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -96,7 +96,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/users'
     | '/auth/verify'
-    | '/parties/$partyId'
+    | '/party/$partyId'
     | '/parties'
   id:
     | '__root__'
@@ -105,7 +105,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/users'
     | '/auth/verify'
-    | '/parties/$partyId'
+    | '/party/$partyId'
     | '/parties/'
   fileRoutesById: FileRoutesById
 }
@@ -115,6 +115,7 @@ export interface RootRouteChildren {
   SearchRoute: typeof SearchRoute
   UsersRoute: typeof UsersRoute
   AuthVerifyRoute: typeof AuthVerifyRoute
+  PartyPartyIdRoute: typeof PartyPartyIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -154,12 +155,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PartiesIndexRouteImport
       parentRoute: typeof PartiesRoute
     }
-    '/parties/$partyId': {
-      id: '/parties/$partyId'
-      path: '/$partyId'
-      fullPath: '/parties/$partyId'
-      preLoaderRoute: typeof PartiesPartyIdRouteImport
-      parentRoute: typeof PartiesRoute
+    '/party/$partyId': {
+      id: '/party/$partyId'
+      path: '/party/$partyId'
+      fullPath: '/party/$partyId'
+      preLoaderRoute: typeof PartyPartyIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/auth/verify': {
       id: '/auth/verify'
@@ -172,12 +173,10 @@ declare module '@tanstack/react-router' {
 }
 
 interface PartiesRouteChildren {
-  PartiesPartyIdRoute: typeof PartiesPartyIdRoute
   PartiesIndexRoute: typeof PartiesIndexRoute
 }
 
 const PartiesRouteChildren: PartiesRouteChildren = {
-  PartiesPartyIdRoute: PartiesPartyIdRoute,
   PartiesIndexRoute: PartiesIndexRoute,
 }
 
@@ -190,6 +189,7 @@ const rootRouteChildren: RootRouteChildren = {
   SearchRoute: SearchRoute,
   UsersRoute: UsersRoute,
   AuthVerifyRoute: AuthVerifyRoute,
+  PartyPartyIdRoute: PartyPartyIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

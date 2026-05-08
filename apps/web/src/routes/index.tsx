@@ -1,6 +1,7 @@
-import { useQuery } from '@tanstack/react-query';
-import { createFileRoute } from '@tanstack/react-router';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { PartyCard } from '../components/PartyCard';
+import { PartyListItem } from '../components/PartyListItem';
 import { useMe } from '../hooks/useMe';
 import { api } from '../lib/api';
 
@@ -9,7 +10,17 @@ export const Route = createFileRoute('/')({
 });
 
 function Home() {
-  const { user, group, isLoading: meLoading } = useMe();
+  const { user, group, isHost, isLoading: meLoading } = useMe();
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
+  const createMutation = useMutation({
+    mutationFn: () => api.parties.create(group!.id),
+    onSuccess: (newParty) => {
+      queryClient.invalidateQueries({ queryKey: ['parties', group?.id] });
+      navigate({ to: '/party/$partyId', params: { partyId: newParty.id } });
+    },
+  });
 
   const { data: parties, isLoading: partiesLoading } = useQuery({
     queryKey: ['parties', group?.id],
@@ -22,6 +33,15 @@ function Home() {
       ?.filter((p) => p.status !== 'watched')
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
       .at(-1) ?? null;
+
+  const otherParties = (parties ?? [])
+    .filter((p) => p.id !== activeParty?.id)
+    .sort((a, b) => {
+      if (!a.scheduledFor && !b.scheduledFor) return b.createdAt.localeCompare(a.createdAt);
+      if (!a.scheduledFor) return 1;
+      if (!b.scheduledFor) return -1;
+      return b.scheduledFor.localeCompare(a.scheduledFor);
+    });
 
   const { data: partyDetail, isLoading: detailLoading } = useQuery({
     queryKey: ['party', activeParty?.id],
@@ -45,12 +65,23 @@ function Home() {
         <p className="text-white/60 text-sm">
           Hey, <span className="text-white font-medium">{user.name}</span>
         </p>
-        <button
-          onClick={() => api.auth.logout().then(() => window.location.reload())}
-          className="text-white/30 text-xs hover:text-white/60 transition-colors"
-        >
-          Sign out
-        </button>
+        <div className="flex items-center gap-4">
+          {isHost && (
+            <button
+              onClick={() => createMutation.mutate()}
+              disabled={createMutation.isPending || !group}
+              className="rounded-full bg-accent-purple px-3 py-1 text-xs font-medium disabled:opacity-40 transition-opacity"
+            >
+              {createMutation.isPending ? 'Creating…' : '+ New party'}
+            </button>
+          )}
+          <button
+            onClick={() => api.auth.logout().then(() => window.location.reload())}
+            className="text-white/30 text-xs hover:text-white/60 transition-colors"
+          >
+            Sign out
+          </button>
+        </div>
       </div>
 
       {!activeParty || !partyDetail ? (
@@ -61,6 +92,21 @@ function Home() {
         </div>
       ) : (
         <PartyCard party={partyDetail} />
+      )}
+
+      {otherParties.length > 0 && (
+        <section className="flex flex-col gap-2">
+          <h2 className="text-sm font-semibold text-white/60 uppercase tracking-wide">
+            Past parties
+          </h2>
+          <ul className="flex flex-col gap-2">
+            {otherParties.map((p) => (
+              <li key={p.id}>
+                <PartyListItem party={p} />
+              </li>
+            ))}
+          </ul>
+        </section>
       )}
     </div>
   );

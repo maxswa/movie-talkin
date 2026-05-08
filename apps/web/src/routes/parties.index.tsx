@@ -23,7 +23,7 @@ function PartiesPage() {
     mutationFn: () => api.parties.create(group!.id),
     onSuccess: (newParty) => {
       queryClient.invalidateQueries({ queryKey: ['parties', group?.id] });
-      navigate({ to: '/parties/$partyId', params: { partyId: newParty.id } });
+      navigate({ to: '/party/$partyId', params: { partyId: newParty.id } });
     },
   });
 

@@ -122,6 +122,12 @@ export interface BracketVote {
   votedFor: string;
 }
 
+export interface CategorySpinPayload {
+  type: 'category_spin';
+  winner: { id: string; name: string };
+  suggestions: { id: string; name: string }[];
+}
+
 export function tmdbImageUrl(path: string | null, size = 'w342'): string | null {
   if (!path) return null;
   return `https://image.tmdb.org/t/p/${size}${path}`;
@@ -175,6 +181,8 @@ export const api = {
         method: 'POST',
         body: JSON.stringify(body),
       }),
+    categorySpin: (partyId: string) =>
+      request<WatchParty>(`/parties/${partyId}/category-spin`, { method: 'POST' }),
   },
 
   categorySuggestions: {

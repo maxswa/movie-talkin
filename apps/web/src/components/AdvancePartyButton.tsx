@@ -1,70 +1,70 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
 import { api, WatchParty } from '../lib/api';
 import { nextStatus } from '../lib/utils';
 import { STATUS_META } from './StatusBadge';
 
 export function AdvancePartyButton({ party }: { party: WatchParty }) {
   const queryClient = useQueryClient();
-  const [selectedCategory, setSelectedCategory] = useState<string>('');
-
-  const next = nextStatus(party.status);
-  const needsCategoryPick = party.status === 'open_for_category_suggestions';
+  const isCategoryPhase = party.status === 'open_for_category_suggestions';
 
   const { data: categorySuggestions = [] } = useQuery({
     queryKey: ['category-suggestions', party.id],
     queryFn: () => api.categorySuggestions.list(party.id),
-    enabled: needsCategoryPick,
+    enabled: isCategoryPhase,
   });
 
-  const mutation = useMutation({
-    mutationFn: () =>
-      api.parties.advance(
-        party.id,
-        needsCategoryPick && selectedCategory ? { selectedCategory } : {},
-      ),
+  const advanceMutation = useMutation({
+    mutationFn: () => api.parties.advance(party.id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['parties'] });
       queryClient.invalidateQueries({ queryKey: ['party', party.id] });
     },
   });
 
+  const spinMutation = useMutation({
+    mutationFn: () => api.parties.categorySpin(party.id),
+  });
+
+  const next = nextStatus(party.status);
   if (!next) return null;
 
+  if (isCategoryPhase) {
+    const canSpin = categorySuggestions.length > 0;
+    return (
+      <div className="flex flex-col gap-3">
+        <button
+          onClick={() => spinMutation.mutate()}
+          disabled={!canSpin || spinMutation.isPending}
+          className="rounded-xl bg-accent-purple px-4 py-3 text-sm font-medium disabled:opacity-40 transition-opacity"
+        >
+          {spinMutation.isPending ? 'Spinning…' : '🎰 Spin to pick category'}
+        </button>
+        {!canSpin && (
+          <p className="text-xs text-white/40 text-center">
+            Need at least one suggestion to spin.
+          </p>
+        )}
+        {spinMutation.isError && (
+          <p className="text-xs text-red-400">{(spinMutation.error as Error).message}</p>
+        )}
+      </div>
+    );
+  }
+
   const nextLabel = STATUS_META[next].label;
-  const canAdvance =
-    !needsCategoryPick || (categorySuggestions.length > 0 && selectedCategory !== '');
 
   return (
     <div className="flex flex-col gap-3">
-      {needsCategoryPick && (
-        <div className="flex flex-col gap-1">
-          <label className="text-xs text-white/50">Select winning category</label>
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="rounded-xl bg-white/10 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-accent-purple/50"
-          >
-            <option value="">— pick one —</option>
-            {categorySuggestions.map((s) => (
-              <option key={s.id} value={s.name}>
-                {s.name}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
-
       <button
-        onClick={() => mutation.mutate()}
-        disabled={!canAdvance || mutation.isPending}
+        onClick={() => advanceMutation.mutate()}
+        disabled={advanceMutation.isPending}
         className="rounded-xl bg-accent-purple px-4 py-3 text-sm font-medium disabled:opacity-40 transition-opacity"
       >
-        {mutation.isPending ? 'Advancing…' : `Advance to "${nextLabel}"`}
+        {advanceMutation.isPending ? 'Advancing…' : `Advance to "${nextLabel}"`}
       </button>
 
-      {mutation.isError && (
-        <p className="text-xs text-red-400">{(mutation.error as Error).message}</p>
+      {advanceMutation.isError && (
+        <p className="text-xs text-red-400">{(advanceMutation.error as Error).message}</p>
       )}
     </div>
   );

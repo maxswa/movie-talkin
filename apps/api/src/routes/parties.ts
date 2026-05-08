@@ -770,6 +770,79 @@ partiesRouter.openapi(
 );
 
 // ---------------------------------------------------------------------------
+// POST /parties/:partyId/category-spin (host only)
+// ---------------------------------------------------------------------------
+
+partiesRouter.openapi(
+  createRoute({
+    method: 'post',
+    path: '/{partyId}/category-spin',
+    tags: ['Parties'],
+    summary: 'Randomly pick a category, broadcast spin event, and advance (host only)',
+    middleware: [requireAuth],
+    request: { params: PartyIdParam },
+    responses: {
+      200: {
+        content: { 'application/json': { schema: WatchPartySchema } },
+        description: 'Category picked and party advanced',
+      },
+      400: {
+        content: { 'application/json': { schema: ErrorSchema } },
+        description: 'Invalid status or no suggestions',
+      },
+      401: {
+        content: { 'application/json': { schema: ErrorSchema } },
+        description: 'Not authenticated',
+      },
+      403: {
+        content: { 'application/json': { schema: ErrorSchema } },
+        description: 'Not a host',
+      },
+      404: {
+        content: { 'application/json': { schema: ErrorSchema } },
+        description: 'Party not found',
+      },
+    },
+  }),
+  async (c) => {
+    const { partyId } = c.req.valid('param');
+    const user = c.get('user');
+
+    const { party, member } = await getPartyAndMembership(partyId, user.id);
+    if (!party) return c.json({ error: 'Party not found' }, 404);
+    if (!member || member.role !== 'host') return c.json({ error: 'Forbidden' }, 403);
+
+    if (party.status !== 'open_for_category_suggestions') {
+      return c.json({ error: 'Party is not in category suggestion phase' }, 400);
+    }
+
+    const suggestions = await db.query.categorySuggestions.findMany({
+      where: eq(categorySuggestions.watchPartyId, partyId),
+    });
+
+    if (suggestions.length === 0) {
+      return c.json({ error: 'No category suggestions to spin' }, 400);
+    }
+
+    const winner = suggestions[Math.floor(Math.random() * suggestions.length)];
+
+    broadcast(partyId, {
+      type: 'category_spin',
+      winner: { id: winner.id, name: winner.name },
+      suggestions: suggestions.map((s) => ({ id: s.id, name: s.name })),
+    });
+
+    const [updated] = await db
+      .update(watchParties)
+      .set({ selectedCategory: winner.name, status: 'category_suggestions_closed' })
+      .where(eq(watchParties.id, partyId))
+      .returning();
+
+    return c.json({ ...updated, status: updated.status as WatchPartyStatus }, 200);
+  },
+);
+
+// ---------------------------------------------------------------------------
 // 8.3 — POST /parties/:partyId/brackets/close-round
 // ---------------------------------------------------------------------------
 

@@ -1,9 +1,22 @@
-import { tmdbImageUrl, type WatchPartyDetail } from '../lib/api';
+import { useQuery } from '@tanstack/react-query';
+import { tmdbImageUrl, type CategorySpinPayload, type WatchPartyDetail } from '../lib/api';
 import { BracketView } from './BracketView';
+import { CategorySpinner } from './CategorySpinner';
 import { CategorySuggestions } from './CategorySuggestions';
 import { MovieSuggestions } from './MovieSuggestions';
 
 export function PartyBody({ party }: { party: WatchPartyDetail }) {
+  const { data: spin } = useQuery<CategorySpinPayload | null>({
+    queryKey: ['category-spin', party.id],
+    queryFn: () => null,
+    enabled: false,
+    staleTime: Infinity,
+  });
+
+  if (spin) {
+    return <CategorySpinner partyId={party.id} spin={spin} />;
+  }
+
   switch (party.status) {
     case 'draft':
       return (

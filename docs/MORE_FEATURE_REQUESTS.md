@@ -8,7 +8,7 @@
 - [x] 2 — Hide content warnings until movie selected (trivial)
 - [x] 3 — Confirm-advance modal (trivial UX)
 - [x] 4 — Spinner persists longer with confetti (trivial polish)
-- [ ] 5 — Future parties section on home (small, FE only)
+- [x] 5 — Future parties section on home (small, FE only)
 - [ ] 6 — Voting counter "x/y voted" per round (medium, builds on existing votes endpoint)
 - [ ] 7 — Delete party (small-medium)
 - [ ] 8 — Go back a status (medium)

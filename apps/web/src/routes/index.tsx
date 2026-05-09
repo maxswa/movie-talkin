@@ -34,8 +34,21 @@ function Home() {
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
       .at(-1) ?? null;
 
-  const otherParties = (parties ?? [])
-    .filter((p) => p.id !== activeParty?.id)
+  const now = Date.now();
+
+  const upcomingParties = (parties ?? [])
+    .filter(
+      (p) =>
+        p.id !== activeParty?.id &&
+        p.status !== 'watched' &&
+        p.scheduledFor !== null &&
+        new Date(p.scheduledFor).getTime() > now,
+    )
+    .sort((a, b) => a.scheduledFor!.localeCompare(b.scheduledFor!));
+
+  const upcomingIds = new Set(upcomingParties.map((p) => p.id));
+  const pastParties = (parties ?? [])
+    .filter((p) => p.id !== activeParty?.id && !upcomingIds.has(p.id))
     .sort((a, b) => {
       if (!a.scheduledFor && !b.scheduledFor) return b.createdAt.localeCompare(a.createdAt);
       if (!a.scheduledFor) return 1;
@@ -94,13 +107,28 @@ function Home() {
         <PartyCard party={partyDetail} />
       )}
 
-      {otherParties.length > 0 && (
+      {upcomingParties.length > 0 && (
+        <section className="flex flex-col gap-2">
+          <h2 className="text-sm font-semibold text-white/60 uppercase tracking-wide">
+            Upcoming
+          </h2>
+          <ul className="flex flex-col gap-2">
+            {upcomingParties.map((p) => (
+              <li key={p.id}>
+                <PartyListItem party={p} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {pastParties.length > 0 && (
         <section className="flex flex-col gap-2">
           <h2 className="text-sm font-semibold text-white/60 uppercase tracking-wide">
             Past parties
           </h2>
           <ul className="flex flex-col gap-2">
-            {otherParties.map((p) => (
+            {pastParties.map((p) => (
               <li key={p.id}>
                 <PartyListItem party={p} />
               </li>

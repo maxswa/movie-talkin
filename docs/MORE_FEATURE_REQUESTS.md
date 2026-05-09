@@ -6,7 +6,7 @@
 
 - [x] 1 — Voted-movie highlight stronger (trivial CSS)
 - [x] 2 — Hide content warnings until movie selected (trivial)
-- [ ] 3 — Confirm-advance modal (trivial UX)
+- [x] 3 — Confirm-advance modal (trivial UX)
 - [ ] 4 — Spinner persists longer with confetti (trivial polish)
 - [ ] 5 — Future parties section on home (small, FE only)
 - [ ] 6 — Voting counter "x/y voted" per round (medium, builds on existing votes endpoint)

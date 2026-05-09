@@ -44,7 +44,15 @@ export function AdvancePartyButton({ party }: { party: WatchParty }) {
     return (
       <div className="flex flex-col gap-3">
         <button
-          onClick={() => spinMutation.mutate()}
+          onClick={() => {
+            if (
+              window.confirm(
+                'Spin the wheel to pick a category? This will close the suggestion phase.',
+              )
+            ) {
+              spinMutation.mutate();
+            }
+          }}
           disabled={!canSpin || spinMutation.isPending}
           className="rounded-xl bg-accent-purple px-4 py-3 text-sm font-medium disabled:opacity-40 transition-opacity"
         >
@@ -71,7 +79,11 @@ export function AdvancePartyButton({ party }: { party: WatchParty }) {
       )}
 
       <button
-        onClick={() => advanceMutation.mutate()}
+        onClick={() => {
+          if (window.confirm(`Advance to "${nextLabel}"?`)) {
+            advanceMutation.mutate();
+          }
+        }}
         disabled={advanceMutation.isPending}
         className="rounded-xl bg-accent-purple px-4 py-3 text-sm font-medium disabled:opacity-40 transition-opacity"
       >

@@ -74,7 +74,15 @@ export function BracketView({ partyId }: { partyId: string }) {
             <p className="text-xs text-white/30">Saving deadline…</p>
           )}
           <button
-            onClick={() => closeRoundMutation.mutate()}
+            onClick={() => {
+              if (
+                window.confirm(
+                  'Close this round? Votes will be tallied and the next round will begin.',
+                )
+              ) {
+                closeRoundMutation.mutate();
+              }
+            }}
             disabled={closeRoundMutation.isPending}
             className="rounded-xl bg-accent-purple px-4 py-3 text-sm font-medium disabled:opacity-40 transition-opacity"
           >

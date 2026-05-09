@@ -25,14 +25,19 @@ export function BracketMovieOption({
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`flex-1 flex flex-col items-center gap-2 rounded-xl p-3 transition-colors disabled:cursor-default ${
+      className={`relative flex-1 flex flex-col items-center gap-2 rounded-xl p-3 transition-all disabled:cursor-default ${
         isWinner
           ? 'bg-green-500/10 ring-1 ring-green-500/30'
           : isVoted
-            ? 'bg-accent-purple/20 ring-1 ring-accent-purple/50'
+            ? 'bg-accent-purple/30 ring-2 ring-accent-purple shadow-lg shadow-accent-purple/40'
             : 'bg-white/5 hover:bg-white/10'
       }`}
     >
+      {isVoted && !isWinner && (
+        <span className="absolute top-1.5 right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-accent-purple text-xs font-bold text-white shadow">
+          ✓
+        </span>
+      )}
       {poster ? (
         <img src={poster} alt={suggestion.title} className="w-full rounded-lg" />
       ) : (

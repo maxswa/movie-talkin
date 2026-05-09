@@ -3,6 +3,7 @@ import { tmdbImageUrl, type CategorySpinPayload, type WatchPartyDetail } from '.
 import { BracketView } from './BracketView';
 import { CategorySpinner } from './CategorySpinner';
 import { CategorySuggestions } from './CategorySuggestions';
+import { ContentWarnings } from './ContentWarnings';
 import { MovieSuggestions } from './MovieSuggestions';
 
 export function PartyBody({ party }: { party: WatchPartyDetail }) {
@@ -52,7 +53,8 @@ export function PartyBody({ party }: { party: WatchPartyDetail }) {
     case 'voting':
       return <BracketView partyId={party.id} />;
 
-    case 'movie_selected': {
+    case 'movie_selected':
+    case 'watched': {
       const movie = party.winningSuggestion;
       if (!movie) return null;
       const poster = tmdbImageUrl(movie.posterPath);
@@ -64,6 +66,7 @@ export function PartyBody({ party }: { party: WatchPartyDetail }) {
             {movie.releaseYear && <p className="text-white/40 text-sm">{movie.releaseYear}</p>}
             <p className="text-white/50 text-xs mt-2">Suggested by {movie.suggestedBy.name}</p>
           </div>
+          <ContentWarnings title={movie.title} year={movie.releaseYear} />
         </div>
       );
     }

@@ -10,7 +10,9 @@
       "WebFetch(domain:github.com)",
       "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\mkswa\\\\Documents\\\\Repos\\\\movie-talkin\" -Directory)",
       "Bash(Select-Object Name)",
-      "Bash(git stash *)"
+      "Bash(git stash *)",
+      "WebFetch(domain:www.doesthedogdie.com)",
+      "WebSearch"
     ]
   }
 }

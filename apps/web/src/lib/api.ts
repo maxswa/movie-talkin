@@ -129,6 +129,17 @@ export interface CategorySpinPayload {
   suggestions: { id: string; name: string }[];
 }
 
+export interface ContentWarning {
+  name: string;
+  yes: number;
+  no: number;
+}
+
+export interface ContentWarningsResponse {
+  warnings: ContentWarning[];
+  source: { id: number; name: string } | null;
+}
+
 export function tmdbImageUrl(path: string | null, size = 'w342'): string | null {
   if (!path) return null;
   return `https://image.tmdb.org/t/p/${size}${path}`;
@@ -210,6 +221,14 @@ export const api = {
 
   tmdb: {
     search: (q: string) => request<TmdbMovie[]>(`/tmdb/search?q=${encodeURIComponent(q)}`),
+  },
+
+  contentWarnings: {
+    get: (title: string, year: number | null) => {
+      const params = new URLSearchParams({ title });
+      if (year) params.set('year', String(year));
+      return request<ContentWarningsResponse>(`/content-warnings?${params}`);
+    },
   },
 
   brackets: {

@@ -9,7 +9,7 @@
 - [x] 5 — Host vote breakdowns
 - [x] 4 — Category spinner
 - [x] 2 — Round auto-advance timer
-- [ ] 6 — Does the dog die
+- [x] 6 — Does the dog die
 
 ---
 

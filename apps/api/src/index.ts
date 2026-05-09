@@ -8,6 +8,7 @@ import { subscribe } from './lib/pubsub.js';
 import { restoreSchedules } from './lib/round-scheduler.js';
 import { authRouter } from './routes/auth.js';
 import { bracketsRouter } from './routes/brackets.js';
+import { contentWarningsRouter } from './routes/content-warnings.js';
 import { groupsRouter } from './routes/groups.js';
 import { partiesRouter } from './routes/parties.js';
 import { tmdbRouter } from './routes/tmdb.js';
@@ -54,6 +55,7 @@ app.route('/groups', groupsRouter);
 app.route('/parties', partiesRouter);
 app.route('/brackets', bracketsRouter);
 app.route('/tmdb', tmdbRouter);
+app.route('/content-warnings', contentWarningsRouter);
 
 app.doc('/doc', {
   openapi: '3.0.0',

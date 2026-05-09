@@ -13,6 +13,7 @@
     "db:generate": "pnpm --filter @movie-talkin/api db:generate",
     "db:migrate": "pnpm --filter @movie-talkin/api db:migrate",
     "db:seed": "pnpm --filter @movie-talkin/api db:seed",
+    "db:fixture": "pnpm --filter @movie-talkin/api db:fixture",
     "db:studio": "pnpm --filter @movie-talkin/api db:studio"
   },
   "devDependencies": {

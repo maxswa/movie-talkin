@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
+import { usePartySocket } from '../hooks/usePartySocket';
 import { api, type WatchPartyDetail } from '../lib/api';
 import { formatDate } from '../lib/utils';
 import { PartyBody } from './PartyBody';
@@ -13,6 +14,7 @@ const INTERACTIVE_STATUSES = new Set([
 ]);
 
 export function PartyCard({ party }: { party: WatchPartyDetail }) {
+  usePartySocket(party.id);
   const interactiveBody = INTERACTIVE_STATUSES.has(party.status);
   const isVoting = party.status === 'voting';
 

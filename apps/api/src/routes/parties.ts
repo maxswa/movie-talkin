@@ -312,6 +312,8 @@ partiesRouter.openapi(
       .where(eq(watchParties.id, partyId))
       .returning();
 
+    broadcast(partyId, { type: 'party_updated' });
+
     return c.json({ ...updated, status: updated.status as WatchPartyStatus }, 200);
   },
 );
@@ -546,6 +548,8 @@ partiesRouter.openapi(
       .set(updates)
       .where(eq(watchParties.id, partyId))
       .returning();
+
+    broadcast(partyId, { type: 'status_changed' });
 
     return c.json({ ...updated, status: updated.status as WatchPartyStatus }, 200);
   },

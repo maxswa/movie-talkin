@@ -53,20 +53,45 @@ tmdbRouter.openapi(
       results: Array<{
         id: number;
         title: string;
+        original_title?: string;
         poster_path: string | null;
         overview: string;
         release_date: string;
+        popularity?: number;
       }>;
     };
 
-    const movies = data.results.map((m) => ({
-      id: m.id,
-      title: m.title,
-      posterPath: m.poster_path ?? null,
-      overview: m.overview || null,
-      releaseYear: m.release_date ? new Date(m.release_date).getFullYear() : null,
-    }));
+    const normalizedQuery = q.toLowerCase().trim();
 
-    return c.json(movies, 200);
+    function matchScore(title: string, originalTitle: string | undefined): number {
+      const candidates = [title, originalTitle ?? ''].filter(Boolean).map((t) => t.toLowerCase());
+      let best = 0;
+      for (const t of candidates) {
+        let s = 0;
+        if (t === normalizedQuery) s = 1000;
+        else if (t.startsWith(normalizedQuery)) s = 400;
+        else if (t.split(/\s+/).some((w) => w.startsWith(normalizedQuery))) s = 200;
+        else if (t.includes(normalizedQuery)) s = 80;
+        if (s > best) best = s;
+      }
+      return best;
+    }
+
+    const ranked = data.results
+      .map((m) => ({
+        id: m.id,
+        title: m.title,
+        posterPath: m.poster_path ?? null,
+        overview: m.overview || null,
+        releaseYear: m.release_date ? new Date(m.release_date).getFullYear() : null,
+        _score: matchScore(m.title, m.original_title) + Math.log1p(m.popularity ?? 0),
+      }))
+      .sort((a, b) => b._score - a._score)
+      .map(({ _score, ...rest }) => {
+        void _score;
+        return rest;
+      });
+
+    return c.json(ranked, 200);
   },
 );

@@ -317,6 +317,93 @@ partiesRouter.openapi(
 );
 
 // ---------------------------------------------------------------------------
+// POST /parties/:partyId/back (host only) — reverse one status step
+// ---------------------------------------------------------------------------
+
+partiesRouter.openapi(
+  createRoute({
+    method: 'post',
+    path: '/{partyId}/back',
+    tags: ['Parties'],
+    summary: 'Reverse the party status by one step (host only)',
+    middleware: [requireAuth],
+    request: { params: PartyIdParam },
+    responses: {
+      200: {
+        content: { 'application/json': { schema: WatchPartySchema } },
+        description: 'Reverted to previous status',
+      },
+      400: {
+        content: { 'application/json': { schema: ErrorSchema } },
+        description: 'Already at the earliest status',
+      },
+      401: {
+        content: { 'application/json': { schema: ErrorSchema } },
+        description: 'Not authenticated',
+      },
+      403: {
+        content: { 'application/json': { schema: ErrorSchema } },
+        description: 'Not a host',
+      },
+      404: {
+        content: { 'application/json': { schema: ErrorSchema } },
+        description: 'Party not found',
+      },
+    },
+  }),
+  async (c) => {
+    const { partyId } = c.req.valid('param');
+    const user = c.get('user');
+
+    const { party, member } = await getPartyAndMembership(partyId, user.id);
+    if (!party) return c.json({ error: 'Party not found' }, 404);
+    if (!member || member.role !== 'host') return c.json({ error: 'Forbidden' }, 403);
+
+    const current = party.status as WatchPartyStatus;
+    const currentIdx = WATCH_PARTY_STATUSES.indexOf(current);
+    if (currentIdx <= 0) {
+      return c.json({ error: 'Already at the earliest status' }, 400);
+    }
+    const previous = WATCH_PARTY_STATUSES[currentIdx - 1];
+
+    const updates: Partial<typeof watchParties.$inferInsert> = { status: previous };
+
+    if (current === 'category_suggestions_closed') {
+      updates.selectedCategory = null;
+    }
+
+    if (current === 'voting') {
+      cancelAutoClose(partyId);
+      await db.delete(brackets).where(eq(brackets.watchPartyId, partyId));
+    }
+
+    if (current === 'movie_selected') {
+      updates.winningSuggestionId = null;
+      const allBrackets = await db.query.brackets.findMany({
+        where: eq(brackets.watchPartyId, partyId),
+      });
+      if (allBrackets.length > 0) {
+        const latestRound = Math.max(...allBrackets.map((b) => b.round));
+        for (const b of allBrackets.filter((x) => x.round === latestRound)) {
+          if (b.suggestionAId !== b.suggestionBId) {
+            await db.update(brackets).set({ winnerId: null }).where(eq(brackets.id, b.id));
+          }
+        }
+      }
+    }
+
+    const [updated] = await db
+      .update(watchParties)
+      .set(updates)
+      .where(eq(watchParties.id, partyId))
+      .returning();
+
+    broadcast(partyId, { type: 'status_changed' });
+    return c.json({ ...updated, status: updated.status as WatchPartyStatus }, 200);
+  },
+);
+
+// ---------------------------------------------------------------------------
 // DELETE /parties/:partyId (host only)
 // ---------------------------------------------------------------------------
 

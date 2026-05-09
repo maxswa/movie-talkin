@@ -32,6 +32,10 @@ export function usePartySocket(partyId: string) {
         queryClient.invalidateQueries({ queryKey: ['parties'] });
         queryClient.removeQueries({ queryKey: ['party', partyId] });
         queryClient.removeQueries({ queryKey: ['brackets', partyId] });
+      } else if (event.type === 'status_changed') {
+        queryClient.invalidateQueries({ queryKey: ['party', partyId] });
+        queryClient.invalidateQueries({ queryKey: ['brackets', partyId] });
+        queryClient.invalidateQueries({ queryKey: ['parties'] });
       }
     };
 

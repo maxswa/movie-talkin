@@ -11,7 +11,7 @@
 - [x] 5 — Future parties section on home (small, FE only)
 - [x] 6 — Voting counter "x/y voted" per round (medium, builds on existing votes endpoint)
 - [x] 7 — Delete party (small-medium)
-- [ ] 8 — Go back a status (medium)
+- [x] 8 — Go back a status (medium)
 - [ ] 9 — Fuzzy TMDB search (small-medium)
 - [ ] 10 — Healing WebSocket connection + more event types (medium)
 - [ ] 11 — "Voting soon" as a planning stage with per-round scheduling (high)

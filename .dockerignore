@@ -1,0 +1,36 @@
+node_modules
+**/node_modules
+**/dist
+**/.turbo
+**/.cache
+
+# Local env / secrets
+.env
+**/.env
+**/.env.local
+
+# SQLite local files
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+**/movie-talkin.db*
+
+# VCS / editor
+.git
+.gitignore
+.vscode
+.idea
+.DS_Store
+
+# Tests / coverage
+coverage
+**/coverage
+**/__tests__
+**/*.test.ts
+**/*.spec.ts
+
+# Docs / misc
+docs
+README.md
+*.log

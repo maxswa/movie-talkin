@@ -10,7 +10,7 @@
 - [x] 4 — Spinner persists longer with confetti (trivial polish)
 - [x] 5 — Future parties section on home (small, FE only)
 - [x] 6 — Voting counter "x/y voted" per round (medium, builds on existing votes endpoint)
-- [ ] 7 — Delete party (small-medium)
+- [x] 7 — Delete party (small-medium)
 - [ ] 8 — Go back a status (medium)
 - [ ] 9 — Fuzzy TMDB search (small-medium)
 - [ ] 10 — Healing WebSocket connection + more event types (medium)

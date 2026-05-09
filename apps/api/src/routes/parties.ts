@@ -316,6 +316,53 @@ partiesRouter.openapi(
   },
 );
 
+// ---------------------------------------------------------------------------
+// DELETE /parties/:partyId (host only)
+// ---------------------------------------------------------------------------
+
+partiesRouter.openapi(
+  createRoute({
+    method: 'delete',
+    path: '/{partyId}',
+    tags: ['Parties'],
+    summary: 'Delete a party (host only). Cascades brackets, suggestions, votes.',
+    middleware: [requireAuth],
+    request: { params: PartyIdParam },
+    responses: {
+      200: {
+        content: { 'application/json': { schema: z.object({ ok: z.boolean() }) } },
+        description: 'Party deleted',
+      },
+      401: {
+        content: { 'application/json': { schema: ErrorSchema } },
+        description: 'Not authenticated',
+      },
+      403: {
+        content: { 'application/json': { schema: ErrorSchema } },
+        description: 'Not a host',
+      },
+      404: {
+        content: { 'application/json': { schema: ErrorSchema } },
+        description: 'Party not found',
+      },
+    },
+  }),
+  async (c) => {
+    const { partyId } = c.req.valid('param');
+    const user = c.get('user');
+
+    const { party, member } = await getPartyAndMembership(partyId, user.id);
+    if (!party) return c.json({ error: 'Party not found' }, 404);
+    if (!member || member.role !== 'host') return c.json({ error: 'Forbidden' }, 403);
+
+    cancelAutoClose(partyId);
+    broadcast(partyId, { type: 'party_deleted' });
+    await db.delete(watchParties).where(eq(watchParties.id, partyId));
+
+    return c.json({ ok: true }, 200);
+  },
+);
+
 partiesRouter.openapi(
   createRoute({
     method: 'post',

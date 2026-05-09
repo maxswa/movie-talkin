@@ -185,6 +185,8 @@ export const api = {
     get: (partyId: string) => request<WatchPartyDetail>(`/parties/${partyId}`),
     create: (groupId: string) =>
       request<WatchParty>(`/groups/${groupId}/parties`, { method: 'POST' }),
+    delete: (partyId: string) =>
+      request<{ ok: boolean }>(`/parties/${partyId}`, { method: 'DELETE' }),
     update: (partyId: string, body: { scheduledFor?: string | null }) =>
       request<WatchParty>(`/parties/${partyId}`, {
         method: 'PATCH',

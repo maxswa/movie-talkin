@@ -42,6 +42,16 @@ function PartyDetailPage() {
           ?.brackets.find((b) => b.roundEndsAt)?.roundEndsAt ?? null
       : null;
 
+  const deleteMutation = useMutation({
+    mutationFn: () => api.parties.delete(partyId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['parties'] });
+      queryClient.removeQueries({ queryKey: ['party', partyId] });
+      queryClient.removeQueries({ queryKey: ['brackets', partyId] });
+      router.navigate({ to: '/' });
+    },
+  });
+
   const updateMutation = useMutation({
     mutationFn: (scheduledFor: string | null) => api.parties.update(partyId, { scheduledFor }),
     onMutate: (scheduledFor) => {
@@ -165,6 +175,33 @@ function PartyDetailPage() {
         <section className="flex flex-col gap-3">
           <h2 className="text-sm font-semibold text-white/60 uppercase tracking-wide">Members</h2>
           <MemberList members={party.members} />
+        </section>
+      )}
+
+      {isHost && (
+        <section className="flex flex-col gap-2 pt-4 border-t border-white/5">
+          <h2 className="text-sm font-semibold text-red-400/80 uppercase tracking-wide">
+            Danger zone
+          </h2>
+          <button
+            type="button"
+            onClick={() => {
+              if (
+                window.confirm(
+                  'Delete this party? All suggestions, brackets, and votes will be permanently removed.',
+                )
+              ) {
+                deleteMutation.mutate();
+              }
+            }}
+            disabled={deleteMutation.isPending}
+            className="self-start rounded-xl bg-red-500/15 px-4 py-2 text-sm font-medium text-red-300 hover:bg-red-500/25 disabled:opacity-40 transition-colors"
+          >
+            {deleteMutation.isPending ? 'Deleting…' : 'Delete party'}
+          </button>
+          {deleteMutation.isError && (
+            <p className="text-xs text-red-400">{(deleteMutation.error as Error).message}</p>
+          )}
         </section>
       )}
     </div>

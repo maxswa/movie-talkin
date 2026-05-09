@@ -28,6 +28,10 @@ export function usePartySocket(partyId: string) {
         queryClient.invalidateQueries({ queryKey: ['brackets', partyId] });
       } else if (event.type === 'vote_cast') {
         queryClient.invalidateQueries({ queryKey: ['brackets', partyId] });
+      } else if (event.type === 'party_deleted') {
+        queryClient.invalidateQueries({ queryKey: ['parties'] });
+        queryClient.removeQueries({ queryKey: ['party', partyId] });
+        queryClient.removeQueries({ queryKey: ['brackets', partyId] });
       }
     };
 

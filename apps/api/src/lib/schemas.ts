@@ -88,6 +88,7 @@ export const BracketSchema = z.object({
   suggestionB: MovieSuggestionSchema,
   voteCountA: z.number(),
   voteCountB: z.number(),
+  voterCount: z.number(),
   myVote: z.string().nullable(),
   winnerId: z.string().nullable(),
   roundEndsAt: z.string().nullable(),
@@ -95,6 +96,7 @@ export const BracketSchema = z.object({
 
 export const BracketRoundSchema = z.object({
   round: z.number(),
+  eligibleVoterCount: z.number(),
   brackets: z.array(BracketSchema),
 });
 

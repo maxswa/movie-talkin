@@ -8,13 +8,15 @@ interface Props {
   bracket: Bracket;
   partyId: string;
   roundClosed: boolean;
+  eligibleVoterCount: number;
 }
 
-export function BracketMatch({ bracket, partyId, roundClosed }: Props) {
+export function BracketMatch({ bracket, partyId, roundClosed, eligibleVoterCount }: Props) {
   const queryClient = useQueryClient();
   const { isHost } = useMe();
   const isBye = bracket.suggestionA.id === bracket.suggestionB.id;
-  const showBreakdown = isHost && !isBye && bracket.winnerId !== null;
+  const showBreakdown = isHost && !isBye;
+  const showCounter = !isBye && bracket.winnerId === null;
 
   const mutation = useMutation({
     mutationFn: (suggestionId: string) => api.brackets.vote(bracket.id, suggestionId),
@@ -69,6 +71,11 @@ export function BracketMatch({ bracket, partyId, roundClosed }: Props) {
           disabled={roundClosed || mutation.isPending}
         />
       </div>
+      {showCounter && (
+        <p className="mt-2 text-center text-[11px] text-white/40">
+          {bracket.voterCount}/{eligibleVoterCount} voted
+        </p>
+      )}
       {showBreakdown && <BracketVoteBreakdown partyId={partyId} bracket={bracket} />}
     </div>
   );

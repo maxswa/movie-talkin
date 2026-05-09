@@ -12,6 +12,7 @@ import {
 } from '../db/schema.js';
 import {
   BracketRoundSchema,
+  BracketSchema,
   BracketVoteSchema,
   CategorySuggestionSchema,
   ErrorSchema,
@@ -790,19 +791,27 @@ partiesRouter.openapi(
     });
     const myVoteMap = new Map(myVotes.map((v) => [v.bracketId, v.votedFor]));
 
-    const roundMap = new Map<number, z.infer<typeof BracketRoundSchema>['brackets']>();
+    const [{ memberCount }] = await db
+      .select({ memberCount: count() })
+      .from(watchGroupMembers)
+      .where(eq(watchGroupMembers.groupId, party.watchGroupId));
+
+    const roundMap = new Map<number, z.infer<typeof BracketSchema>[]>();
     for (const bracket of allBrackets) {
       const suggestionA = suggestionMap.get(bracket.suggestionAId)!;
       const suggestionB = suggestionMap.get(bracket.suggestionBId)!;
       const counts = voteCountMap.get(bracket.id) ?? new Map();
+      const voteCountA = counts.get(bracket.suggestionAId) ?? 0;
+      const voteCountB = counts.get(bracket.suggestionBId) ?? 0;
 
       const detail = {
         id: bracket.id,
         round: bracket.round,
         suggestionA,
         suggestionB,
-        voteCountA: counts.get(bracket.suggestionAId) ?? 0,
-        voteCountB: counts.get(bracket.suggestionBId) ?? 0,
+        voteCountA,
+        voteCountB,
+        voterCount: voteCountA + voteCountB,
         myVote: myVoteMap.get(bracket.id) ?? null,
         winnerId: bracket.winnerId,
         roundEndsAt: bracket.roundEndsAt ?? null,
@@ -814,7 +823,7 @@ partiesRouter.openapi(
 
     const rounds = [...roundMap.entries()]
       .sort(([a], [b]) => a - b)
-      .map(([round, bs]) => ({ round, brackets: bs }));
+      .map(([round, bs]) => ({ round, eligibleVoterCount: memberCount, brackets: bs }));
 
     return c.json(rounds, 200);
   },

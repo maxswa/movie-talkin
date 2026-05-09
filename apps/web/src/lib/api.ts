@@ -107,6 +107,7 @@ export interface Bracket {
   suggestionB: MovieSuggestion;
   voteCountA: number;
   voteCountB: number;
+  voterCount: number;
   myVote: string | null;
   winnerId: string | null;
   roundEndsAt: string | null;
@@ -114,6 +115,7 @@ export interface Bracket {
 
 export interface BracketRound {
   round: number;
+  eligibleVoterCount: number;
   brackets: Bracket[];
 }
 

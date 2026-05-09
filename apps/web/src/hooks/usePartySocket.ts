@@ -26,6 +26,8 @@ export function usePartySocket(partyId: string) {
         queryClient.invalidateQueries({ queryKey: ['parties'] });
       } else if (event.type === 'round_deadline_changed') {
         queryClient.invalidateQueries({ queryKey: ['brackets', partyId] });
+      } else if (event.type === 'vote_cast') {
+        queryClient.invalidateQueries({ queryKey: ['brackets', partyId] });
       }
     };
 

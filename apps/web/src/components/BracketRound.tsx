@@ -6,9 +6,16 @@ interface Props {
   brackets: Bracket[];
   partyId: string;
   isCurrentRound: boolean;
+  eligibleVoterCount: number;
 }
 
-export function BracketRound({ round, brackets, partyId, isCurrentRound }: Props) {
+export function BracketRound({
+  round,
+  brackets,
+  partyId,
+  isCurrentRound,
+  eligibleVoterCount,
+}: Props) {
   const roundClosed = brackets.every((b) => b.winnerId !== null);
 
   return (
@@ -21,6 +28,7 @@ export function BracketRound({ round, brackets, partyId, isCurrentRound }: Props
             bracket={bracket}
             partyId={partyId}
             roundClosed={roundClosed}
+            eligibleVoterCount={eligibleVoterCount}
           />
         ))}
       </div>

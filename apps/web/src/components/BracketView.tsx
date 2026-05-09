@@ -53,13 +53,14 @@ export function BracketView({ partyId }: { partyId: string }) {
 
   return (
     <div className="flex flex-col gap-6">
-      {rounds.map(({ round, brackets }) => (
+      {rounds.map(({ round, brackets, eligibleVoterCount }) => (
         <BracketRound
           key={round}
           round={round}
           brackets={brackets}
           partyId={partyId}
           isCurrentRound={round === currentRound}
+          eligibleVoterCount={eligibleVoterCount}
         />
       ))}
 

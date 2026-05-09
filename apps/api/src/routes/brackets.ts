@@ -2,6 +2,7 @@ import { createRoute, OpenAPIHono, z } from '@hono/zod-openapi';
 import { and, eq } from 'drizzle-orm';
 import { db } from '../db/client.js';
 import { brackets, movieVotes, watchGroupMembers, watchParties } from '../db/schema.js';
+import { broadcast } from '../lib/pubsub.js';
 import { ErrorSchema } from '../lib/schemas.js';
 import { requireAuth } from '../middleware/auth.js';
 import type { AppEnv } from '../lib/types.js';
@@ -91,6 +92,8 @@ bracketsRouter.openapi(
         target: [movieVotes.bracketId, movieVotes.userId],
         set: { votedFor: suggestionId, updatedAt: new Date().toISOString() },
       });
+
+    broadcast(party!.id, { type: 'vote_cast' });
 
     return c.json({ ok: true }, 200);
   },

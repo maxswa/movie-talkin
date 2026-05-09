@@ -1,4 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query';
+import confetti from 'canvas-confetti';
 import { useEffect, useState } from 'react';
 import type { CategorySpinPayload } from '../lib/api';
 
@@ -14,7 +15,22 @@ const SEGMENT_COLORS = [
 ];
 
 const SPIN_DURATION_MS = 4000;
-const POST_SPIN_PAUSE_MS = 800;
+const POST_SPIN_PAUSE_MS = 3000;
+
+function fireConfetti() {
+  const burst = (opts: confetti.Options) =>
+    confetti({ disableForReducedMotion: true, ...opts });
+
+  burst({ particleCount: 90, spread: 70, origin: { y: 0.55 } });
+  setTimeout(
+    () => burst({ particleCount: 60, spread: 90, angle: 60, origin: { x: 0, y: 0.7 } }),
+    200,
+  );
+  setTimeout(
+    () => burst({ particleCount: 60, spread: 90, angle: 120, origin: { x: 1, y: 0.7 } }),
+    350,
+  );
+}
 
 export function CategorySpinner({
   partyId,
@@ -25,6 +41,7 @@ export function CategorySpinner({
 }) {
   const queryClient = useQueryClient();
   const [rotation, setRotation] = useState(0);
+  const [landed, setLanded] = useState(false);
 
   const { winner, suggestions } = spin;
   const segAngle = 360 / suggestions.length;
@@ -34,6 +51,10 @@ export function CategorySpinner({
     if (winnerIndex < 0) return;
     const target = 360 * 5 - (winnerIndex + 0.5) * segAngle;
     const startId = window.setTimeout(() => setRotation(target), 50);
+    const landId = window.setTimeout(() => {
+      setLanded(true);
+      fireConfetti();
+    }, SPIN_DURATION_MS + 50);
     const cleanupId = window.setTimeout(() => {
       queryClient.removeQueries({ queryKey: ['category-spin', partyId] });
       queryClient.invalidateQueries({ queryKey: ['party', partyId] });
@@ -41,13 +62,16 @@ export function CategorySpinner({
     }, SPIN_DURATION_MS + POST_SPIN_PAUSE_MS);
     return () => {
       window.clearTimeout(startId);
+      window.clearTimeout(landId);
       window.clearTimeout(cleanupId);
     };
   }, [partyId, winnerIndex, segAngle, queryClient]);
 
   return (
     <div className="flex flex-col items-center gap-4 py-2">
-      <p className="text-xs text-white/50 uppercase tracking-widest">Spinning…</p>
+      <p className="text-xs text-white/50 uppercase tracking-widest">
+        {landed ? 'Winner!' : 'Spinning…'}
+      </p>
       <div className="relative w-64 h-64">
         <svg
           viewBox="-110 -110 220 220"
@@ -80,6 +104,9 @@ export function CategorySpinner({
           }}
         />
       </div>
+      {landed && (
+        <p className="text-lg font-semibold text-white animate-pulse">{winner.name}</p>
+      )}
     </div>
   );
 }

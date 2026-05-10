@@ -112,9 +112,7 @@ function Home() {
 
       {upcomingParties.length > 0 && (
         <section className="flex flex-col gap-2">
-          <h2 className="text-sm font-semibold text-white/60 uppercase tracking-wide">
-            Upcoming
-          </h2>
+          <h2 className="text-sm font-semibold text-white/60 uppercase tracking-wide">Upcoming</h2>
           <ul className="flex flex-col gap-2">
             {upcomingParties.map((p) => (
               <li key={p.id}>

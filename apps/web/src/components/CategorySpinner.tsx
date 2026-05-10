@@ -18,8 +18,7 @@ const SPIN_DURATION_MS = 4000;
 const POST_SPIN_PAUSE_MS = 3000;
 
 function fireConfetti() {
-  const burst = (opts: confetti.Options) =>
-    confetti({ disableForReducedMotion: true, ...opts });
+  const burst = (opts: confetti.Options) => confetti({ disableForReducedMotion: true, ...opts });
 
   burst({ particleCount: 90, spread: 70, origin: { y: 0.55 } });
   setTimeout(
@@ -32,13 +31,7 @@ function fireConfetti() {
   );
 }
 
-export function CategorySpinner({
-  partyId,
-  spin,
-}: {
-  partyId: string;
-  spin: CategorySpinPayload;
-}) {
+export function CategorySpinner({ partyId, spin }: { partyId: string; spin: CategorySpinPayload }) {
   const queryClient = useQueryClient();
   const [rotation, setRotation] = useState(0);
   const [landed, setLanded] = useState(false);
@@ -104,9 +97,7 @@ export function CategorySpinner({
           }}
         />
       </div>
-      {landed && (
-        <p className="text-lg font-semibold text-white animate-pulse">{winner.name}</p>
-      )}
+      {landed && <p className="text-lg font-semibold text-white animate-pulse">{winner.name}</p>}
     </div>
   );
 }

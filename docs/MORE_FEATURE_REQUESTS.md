@@ -96,7 +96,7 @@
 - Schema: add `roundStartsAt` to brackets (mirror of `roundEndsAt`) OR a separate `round_schedule` table keyed by `(watchPartyId, roundNumber)` if we want to plan rounds before brackets exist
 - Backend changes:
   - New endpoint `PATCH /parties/:partyId/round-schedule` accepting `{ rounds: [{ round, startsAt, endsAt }] }`
-  - Extend the round-scheduler so it can also schedule the *opening* of a round, not just the close
+  - Extend the round-scheduler so it can also schedule the _opening_ of a round, not just the close
   - On advance to `voting`, generate round-1 brackets with the planned start/end
 - Frontend:
   - New `RoundSchedulePlanner` component on the detail page during this stage (host only)

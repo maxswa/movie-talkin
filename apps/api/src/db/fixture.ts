@@ -158,9 +158,9 @@ if (past('voting')) {
     where: eq(movieSuggestions.watchPartyId, party.id),
   });
   const pairings = buildRoundOnePairings(allMovies.map((m) => m.id));
-  await db.insert(brackets).values(
-    pairings.map((p) => ({ watchPartyId: party.id, round: 1, ...p })),
-  );
+  await db
+    .insert(brackets)
+    .values(pairings.map((p) => ({ watchPartyId: party.id, round: 1, ...p })));
 
   // Mid-round vote progress for "voting" specifically (not when advancing past it)
   if (targetStatus === 'voting') {
@@ -220,9 +220,9 @@ if (past('movie_selected')) {
     }
 
     const nextPairings = buildNextRoundPairings(winners);
-    await db.insert(brackets).values(
-      nextPairings.map((p) => ({ watchPartyId: party.id, round: currentRound + 1, ...p })),
-    );
+    await db
+      .insert(brackets)
+      .values(nextPairings.map((p) => ({ watchPartyId: party.id, round: currentRound + 1, ...p })));
     currentRound++;
   }
 }

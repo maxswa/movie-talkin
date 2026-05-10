@@ -9,10 +9,7 @@ export function BracketTree({ rounds }: { rounds: BracketRound[] }) {
     <div className="overflow-x-auto -mx-4 px-4 pb-2">
       <div className="flex gap-3 min-w-fit items-stretch">
         {rounds.map(({ round, brackets }) => (
-          <div
-            key={round}
-            className="flex flex-col shrink-0 w-[170px]"
-          >
+          <div key={round} className="flex flex-col shrink-0 w-[170px]">
             <p className="text-[10px] text-white/60 uppercase tracking-widest text-center mb-2">
               {round === finalRound ? 'Final' : `Round ${round}`}
             </p>
@@ -89,11 +86,7 @@ function TreeOption({
   return (
     <div
       className={`flex items-center gap-2 rounded-lg p-1.5 ${
-        isWinner
-          ? 'bg-accent-purple/20 ring-1 ring-accent-purple/50'
-          : isLoser
-            ? 'opacity-40'
-            : ''
+        isWinner ? 'bg-accent-purple/20 ring-1 ring-accent-purple/50' : isLoser ? 'opacity-40' : ''
       }`}
     >
       {poster ? (

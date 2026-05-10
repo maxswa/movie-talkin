@@ -201,16 +201,12 @@ export const api = {
         method: 'PATCH',
         body: JSON.stringify(body),
       }),
-    advance: (
-      partyId: string,
-      body: { selectedCategory?: string; durationMs?: number } = {},
-    ) =>
+    advance: (partyId: string, body: { selectedCategory?: string; durationMs?: number } = {}) =>
       request<WatchParty>(`/parties/${partyId}/advance`, {
         method: 'POST',
         body: JSON.stringify(body),
       }),
-    back: (partyId: string) =>
-      request<WatchParty>(`/parties/${partyId}/back`, { method: 'POST' }),
+    back: (partyId: string) => request<WatchParty>(`/parties/${partyId}/back`, { method: 'POST' }),
     categorySpin: (partyId: string) =>
       request<WatchParty>(`/parties/${partyId}/category-spin`, { method: 'POST' }),
   },

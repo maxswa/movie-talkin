@@ -26,8 +26,7 @@ export function RoundCountdown({ endsAt }: { endsAt: string | null }) {
   const min = Math.floor((totalSec % 3600) / 60);
   const sec = totalSec % 60;
   const pad = (n: number) => String(n).padStart(2, '0');
-  const formatted =
-    hours > 0 ? `${hours}:${pad(min)}:${pad(sec)}` : `${min}:${pad(sec)}`;
+  const formatted = hours > 0 ? `${hours}:${pad(min)}:${pad(sec)}` : `${min}:${pad(sec)}`;
   const urgent = remainingMs < 30_000;
 
   return (

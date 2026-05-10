@@ -81,17 +81,17 @@ fly deploy
 
 ### Required env vars
 
-| Var                        | Purpose                                     | Notes                                                                         |
-| -------------------------- | ------------------------------------------- | ----------------------------------------------------------------------------- |
-| `DB_URL`                   | libSQL connection                           | `libsql://...` for Turso                                                      |
-| `DB_AUTH_TOKEN`            | Turso auth                                  | Token from `turso db tokens create`                                           |
-| `SESSION_SECRET`           | Signs session cookies                       | 32+ random bytes                                                              |
-| `APP_URL`                  | Magic-link base URL                         | `https://movie-talkin.fly.dev`                                                |
-| `NODE_ENV`                 | Enables `Secure` cookie flag                | `production`                                                                  |
-| `TMDB_API_KEY`             | Movie search                                | https://www.themoviedb.org/settings/api                                       |
-| `DOES_THE_DOG_DIE_API_KEY` | Content warnings                            | Optional — endpoint returns empty warnings when unset                          |
-| `CORS_ORIGIN`              | Cross-origin override                       | Leave unset for same-origin deploy                                            |
-| `PORT`                     | HTTP listen port                            | Defaults to 3000; Fly's `internal_port` should match                          |
+| Var                        | Purpose                      | Notes                                                 |
+| -------------------------- | ---------------------------- | ----------------------------------------------------- |
+| `DB_URL`                   | libSQL connection            | `libsql://...` for Turso                              |
+| `DB_AUTH_TOKEN`            | Turso auth                   | Token from `turso db tokens create`                   |
+| `SESSION_SECRET`           | Signs session cookies        | 32+ random bytes                                      |
+| `APP_URL`                  | Magic-link base URL          | `https://movie-talkin.fly.dev`                        |
+| `NODE_ENV`                 | Enables `Secure` cookie flag | `production`                                          |
+| `TMDB_API_KEY`             | Movie search                 | https://www.themoviedb.org/settings/api               |
+| `DOES_THE_DOG_DIE_API_KEY` | Content warnings             | Optional — endpoint returns empty warnings when unset |
+| `CORS_ORIGIN`              | Cross-origin override        | Leave unset for same-origin deploy                    |
+| `PORT`                     | HTTP listen port             | Defaults to 3000; Fly's `internal_port` should match  |
 
 ## Phase 3 — Verify & seed
 

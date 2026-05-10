@@ -2,13 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { api, type Bracket } from '../lib/api';
 
-export function BracketVoteBreakdown({
-  partyId,
-  bracket,
-}: {
-  partyId: string;
-  bracket: Bracket;
-}) {
+export function BracketVoteBreakdown({ partyId, bracket }: { partyId: string; bracket: Bracket }) {
   const [open, setOpen] = useState(false);
 
   const { data: votes = [], isLoading } = useQuery({

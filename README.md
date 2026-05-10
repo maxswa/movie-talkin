@@ -81,49 +81,49 @@ All scripts run from the repo root. They forward to the right workspace via pnpm
 
 ### Dev
 
-| Command          | What it does                                                           |
-| ---------------- | ---------------------------------------------------------------------- |
-| `pnpm dev`       | Start API + web in parallel                                            |
-| `pnpm dev:api`   | Start the API only (`tsx watch`, `:3000`)                              |
-| `pnpm dev:web`   | Start the web dev server only (Vite, `:5173`)                          |
-| `pnpm typecheck` | Typecheck every workspace                                              |
-| `pnpm lint`      | ESLint across workspaces                                               |
-| `pnpm format`    | Prettier write across the repo                                         |
+| Command          | What it does                                  |
+| ---------------- | --------------------------------------------- |
+| `pnpm dev`       | Start API + web in parallel                   |
+| `pnpm dev:api`   | Start the API only (`tsx watch`, `:3000`)     |
+| `pnpm dev:web`   | Start the web dev server only (Vite, `:5173`) |
+| `pnpm typecheck` | Typecheck every workspace                     |
+| `pnpm lint`      | ESLint across workspaces                      |
+| `pnpm format`    | Prettier write across the repo                |
 
 ### Build
 
-| Command       | What it does                                                                  |
-| ------------- | ----------------------------------------------------------------------------- |
-| `pnpm build`  | Production build (compile API to `apps/api/dist`, build web to `apps/web/dist`) |
-| `pnpm test:api` | Run API vitest suite                                                          |
+| Command         | What it does                                                                    |
+| --------------- | ------------------------------------------------------------------------------- |
+| `pnpm build`    | Production build (compile API to `apps/api/dist`, build web to `apps/web/dist`) |
+| `pnpm test:api` | Run API vitest suite                                                            |
 
 ### Database
 
-| Command              | What it does                                                              |
-| -------------------- | ------------------------------------------------------------------------- |
-| `pnpm db:generate`   | Generate a new migration after editing `apps/api/src/db/schema.ts`        |
-| `pnpm db:migrate`    | Apply pending migrations against `DB_URL`                                 |
-| `pnpm db:seed`       | One-time host bootstrap (uses `SEED_*` env vars, prints a magic link)     |
-| `pnpm db:fixture`    | Generate a test party at any status with N users (see Test data above)    |
-| `pnpm db:studio`     | Open Drizzle Studio against the current DB                                |
+| Command            | What it does                                                           |
+| ------------------ | ---------------------------------------------------------------------- |
+| `pnpm db:generate` | Generate a new migration after editing `apps/api/src/db/schema.ts`     |
+| `pnpm db:migrate`  | Apply pending migrations against `DB_URL`                              |
+| `pnpm db:seed`     | One-time host bootstrap (uses `SEED_*` env vars, prints a magic link)  |
+| `pnpm db:fixture`  | Generate a test party at any status with N users (see Test data above) |
+| `pnpm db:studio`   | Open Drizzle Studio against the current DB                             |
 
 ## Environment variables
 
 `apps/api/.env` (see `.env.example`):
 
-| Variable                   | Default                  | Description                                              |
-| -------------------------- | ------------------------ | -------------------------------------------------------- |
-| `PORT`                     | `3000`                   | API server port                                          |
-| `DB_URL`                   | `file:./movie-talkin.db` | libSQL URL (`libsql://...` for Turso)                    |
-| `DB_AUTH_TOKEN`            | —                        | Required for Turso, not for local file DB                |
-| `CORS_ORIGIN`              | `http://localhost:5173`  | Allowed origin (irrelevant in same-origin prod deploy)   |
-| `APP_URL`                  | `http://localhost:5173`  | Base URL embedded in magic-link emails                   |
-| `SESSION_SECRET`           | dev placeholder          | Signs session cookies — set a real 32-byte hex in prod   |
-| `TMDB_API_KEY`             | —                        | Required for movie search (https://themoviedb.org)       |
-| `DOES_THE_DOG_DIE_API_KEY` | —                        | Optional — content warnings degrade to empty when unset  |
-| `SEED_HOST_NAME`           | —                        | Used by `db:seed`                                        |
-| `SEED_HOST_EMAIL`          | —                        | Used by `db:seed` (optional)                             |
-| `SEED_GROUP_NAME`          | —                        | Used by `db:seed`                                        |
+| Variable                   | Default                  | Description                                             |
+| -------------------------- | ------------------------ | ------------------------------------------------------- |
+| `PORT`                     | `3000`                   | API server port                                         |
+| `DB_URL`                   | `file:./movie-talkin.db` | libSQL URL (`libsql://...` for Turso)                   |
+| `DB_AUTH_TOKEN`            | —                        | Required for Turso, not for local file DB               |
+| `CORS_ORIGIN`              | `http://localhost:5173`  | Allowed origin (irrelevant in same-origin prod deploy)  |
+| `APP_URL`                  | `http://localhost:5173`  | Base URL embedded in magic-link emails                  |
+| `SESSION_SECRET`           | dev placeholder          | Signs session cookies — set a real 32-byte hex in prod  |
+| `TMDB_API_KEY`             | —                        | Required for movie search (https://themoviedb.org)      |
+| `DOES_THE_DOG_DIE_API_KEY` | —                        | Optional — content warnings degrade to empty when unset |
+| `SEED_HOST_NAME`           | —                        | Used by `db:seed`                                       |
+| `SEED_HOST_EMAIL`          | —                        | Used by `db:seed` (optional)                            |
+| `SEED_GROUP_NAME`          | —                        | Used by `db:seed`                                       |
 
 ## Deployment
 

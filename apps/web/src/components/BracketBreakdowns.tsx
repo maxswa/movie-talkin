@@ -44,9 +44,7 @@ function BreakdownRow({ partyId, bracket }: { partyId: string; bracket: Bracket 
           <span className="text-white/60 ml-1">({bracket.voteCountA})</span>
         </span>
         <span className="text-white/45 text-xs shrink-0">vs</span>
-        <span
-          className={`flex-1 truncate text-right ${aWon ? 'text-white/70' : 'font-semibold'}`}
-        >
+        <span className={`flex-1 truncate text-right ${aWon ? 'text-white/70' : 'font-semibold'}`}>
           {bracket.suggestionB.title}
           <span className="text-white/60 ml-1">({bracket.voteCountB})</span>
         </span>

@@ -30,7 +30,10 @@ interface DddTopicStat {
 
 interface CacheEntry {
   expiresAt: number;
-  body: { warnings: { name: string; yes: number; no: number }[]; source: { id: number; name: string } | null };
+  body: {
+    warnings: { name: string; yes: number; no: number }[];
+    source: { id: number; name: string } | null;
+  };
 }
 
 const CACHE_TTL_MS = 60 * 60 * 1000;

@@ -109,8 +109,8 @@ function PartyPreview({
             </div>
             {otherCount > 0 && (
               <p className="text-xs text-white/70">
-                {otherCount} other{otherCount === 1 ? '' : 's'}{' '}
-                {otherCount === 1 ? 'has' : 'have'} suggested a category
+                {otherCount} other{otherCount === 1 ? '' : 's'} {otherCount === 1 ? 'has' : 'have'}{' '}
+                suggested a category
               </p>
             )}
           </div>

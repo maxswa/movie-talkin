@@ -20,7 +20,7 @@ export function MovieSuggestions({ partyId }: { partyId: string }) {
   const otherSuggestions = suggestions.filter((s) => s.suggestedBy.id !== user?.id);
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 rounded-2xl bg-surface p-5">
       <ul className="flex flex-col gap-2">
         {!ownSuggestion && !showAll && (
           <li className="text-white/30 text-sm text-center py-4">No movies suggested yet.</li>
@@ -37,8 +37,8 @@ export function MovieSuggestions({ partyId }: { partyId: string }) {
       {otherSuggestions.length > 0 && (
         <div className="flex items-center justify-between">
           <p className="text-xs text-white/40">
-            {otherSuggestions.length}{' '}
-            {otherSuggestions.length === 1 ? 'other has' : 'others have'} suggested a movie
+            {otherSuggestions.length} {otherSuggestions.length === 1 ? 'other has' : 'others have'}{' '}
+            suggested a movie
           </p>
           {isHost && (
             <button

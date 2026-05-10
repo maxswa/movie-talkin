@@ -32,7 +32,7 @@ export function PartyBody({ party }: { party: WatchPartyDetail }) {
 
     case 'category_suggestions_closed':
       return (
-        <div className="flex flex-col items-center gap-3 py-6">
+        <div className="flex flex-col items-center gap-3 py-6 rounded-2xl bg-surface">
           <p className="text-white/40 text-xs uppercase tracking-widest">Category</p>
           <span className="rounded-full bg-accent-purple/20 text-accent-purple px-5 py-2 text-sm font-medium">
             {party.selectedCategory}

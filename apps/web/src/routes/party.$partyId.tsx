@@ -8,10 +8,11 @@ import { MemberList } from '../components/MemberList';
 import { PartyBody } from '../components/PartyBody';
 import { RoundCountdown } from '../components/RoundCountdown';
 import { StatusBadge } from '../components/StatusBadge';
+import { STATUS_META } from '../components/StatusBadge';
 import { useMe } from '../hooks/useMe';
 import { usePartySocket } from '../hooks/usePartySocket';
 import { api, type WatchPartyDetail } from '../lib/api';
-import { formatDate, toLocalInputValue } from '../lib/utils';
+import { formatDate, toLocalInputValue, WATCH_PARTY_STATUSES } from '../lib/utils';
 
 export const Route = createFileRoute('/party/$partyId')({
   component: PartyDetailPage,
@@ -48,6 +49,15 @@ function PartyDetailPage() {
       queryClient.removeQueries({ queryKey: ['party', partyId] });
       queryClient.removeQueries({ queryKey: ['brackets', partyId] });
       router.navigate({ to: '/' });
+    },
+  });
+
+  const backMutation = useMutation({
+    mutationFn: () => api.parties.back(partyId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['parties'] });
+      queryClient.invalidateQueries({ queryKey: ['party', partyId] });
+      queryClient.invalidateQueries({ queryKey: ['brackets', partyId] });
     },
   });
 
@@ -94,27 +104,27 @@ function PartyDetailPage() {
 
   return (
     <div className="flex flex-col gap-6 px-4 py-6">
-      <button
-        type="button"
-        onClick={() => {
-          if (window.history.length > 1) {
-            router.history.back();
-          } else {
-            router.navigate({ to: '/' });
-          }
-        }}
-        className="self-start flex items-center gap-2 text-sm text-white/50 hover:text-white transition-colors"
-        aria-label="Back"
-      >
-        <span className="text-lg leading-none">←</span>
-        Back
-      </button>
+      <div className="flex justify-between items-center">
+        <button
+          type="button"
+          onClick={() => {
+            if (window.history.length > 1) {
+              router.history.back();
+            } else {
+              router.navigate({ to: '/' });
+            }
+          }}
+          className="self-start flex items-center gap-2 text-sm text-white/50 hover:text-white transition-colors"
+          aria-label="Back"
+        >
+          <span className="text-lg leading-none">←</span>
+          Back
+        </button>
+        <StatusBadge status={party.status} />
+      </div>
 
       <header className="flex flex-col gap-3">
-        <div className="flex items-center gap-3">
-          <StatusBadge status={party.status} />
-          {updateMutation.isPending && <span className="text-xs text-white/30">Saving…</span>}
-        </div>
+        {updateMutation.isPending && <span className="text-xs text-white/30">Saving…</span>}
         <h1 className="text-2xl font-semibold leading-tight">
           {party.selectedCategory ?? 'Category TBD'}
         </h1>
@@ -136,13 +146,7 @@ function PartyDetailPage() {
 
       {isHost && <AdvancePartyButton party={party} />}
 
-      {party.status === 'voting' ? (
-        <PartyBody party={party} />
-      ) : (
-        <section className="rounded-2xl bg-surface p-5">
-          <PartyBody party={party} />
-        </section>
-      )}
+      <PartyBody party={party} />
 
       {rounds.length > 0 && (
         <section className="flex flex-col gap-3">
@@ -179,6 +183,29 @@ function PartyDetailPage() {
           <h2 className="text-sm font-semibold text-red-400/80 uppercase tracking-wide">
             Danger zone
           </h2>
+          {(() => {
+            const idx = WATCH_PARTY_STATUSES.indexOf(party.status);
+            const previous = idx > 0 ? WATCH_PARTY_STATUSES[idx - 1] : null;
+            const previousLabel = previous ? STATUS_META[previous].label : null;
+            if (!previous || !previousLabel) return null;
+            return (
+              <button
+                type="button"
+                onClick={() => {
+                  if (window.confirm(`Revert to "${previousLabel}"? Some progress may be lost.`)) {
+                    backMutation.mutate();
+                  }
+                }}
+                disabled={backMutation.isPending}
+                className="self-start rounded-xl bg-white/10 px-4 py-2 text-sm font-medium text-white/70 hover:bg-white/15 disabled:opacity-40 transition-colors"
+              >
+                {backMutation.isPending ? 'Reverting…' : `← Revert to "${previousLabel}"`}
+              </button>
+            );
+          })()}
+          {backMutation.isError && (
+            <p className="text-xs text-red-400">{(backMutation.error as Error).message}</p>
+          )}
           <button
             type="button"
             onClick={() => {

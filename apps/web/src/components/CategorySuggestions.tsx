@@ -99,7 +99,7 @@ export function CategorySuggestions({ partyId }: { partyId: string }) {
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 rounded-2xl bg-surface p-5">
       <ul className="flex flex-col gap-2">
         {suggestions.length === 0 && (
           <li className="text-white/30 text-sm text-center py-4">

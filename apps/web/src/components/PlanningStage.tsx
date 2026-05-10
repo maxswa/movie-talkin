@@ -84,7 +84,7 @@ export function PlanningStage({ party }: { party: WatchPartyDetail }) {
         </div>
       )}
 
-      <section className="flex flex-col gap-2">
+      <section className="flex flex-col gap-2 rounded-2xl bg-surface p-4">
         <h3 className="text-xs font-semibold text-white/60 uppercase tracking-wide">
           Movie suggestions
         </h3>

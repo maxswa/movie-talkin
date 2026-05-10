@@ -35,6 +35,7 @@ export function MovieSuggestionItem({ suggestion, isOwn, partyId }: Props) {
         <Link
           to="/search"
           search={{ partyId }}
+          replace
           className="shrink-0 text-xs text-accent-blue hover:text-white transition-colors"
         >
           Change

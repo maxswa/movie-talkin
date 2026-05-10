@@ -34,7 +34,11 @@ function Search() {
     mutationFn: (tmdbId: number) => api.movieSuggestions.create(partyId, tmdbId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['movie-suggestions', partyId] });
-      navigate({ to: '/' });
+      if (partyId) {
+        navigate({ to: '/party/$partyId', params: { partyId }, replace: true });
+      } else {
+        navigate({ to: '/', replace: true });
+      }
     },
   });
 
@@ -46,7 +50,13 @@ function Search() {
     <div className="flex flex-col gap-5 p-5">
       <div className="flex items-center gap-3 pt-2">
         <button
-          onClick={() => navigate({ to: '/' })}
+          onClick={() => {
+            if (partyId) {
+              navigate({ to: '/party/$partyId', params: { partyId }, replace: true });
+            } else {
+              navigate({ to: '/', replace: true });
+            }
+          }}
           className="text-white/70 hover:text-white transition-colors text-xl leading-none"
           aria-label="Back"
         >

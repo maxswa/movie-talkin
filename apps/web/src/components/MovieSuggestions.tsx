@@ -22,8 +22,15 @@ export function MovieSuggestions({ partyId }: { partyId: string }) {
   return (
     <div className="flex flex-col gap-4 rounded-2xl bg-surface p-5">
       <ul className="flex flex-col gap-2">
-        {!ownSuggestion && !showAll && (
-          <li className="text-white/45 text-sm text-center py-4">No movies suggested yet.</li>
+        {!ownSuggestion && (
+          <Link
+            to="/search"
+            search={{ partyId }}
+            replace
+            className="block rounded-xl bg-accent-purple py-3 text-sm font-medium text-center"
+          >
+            Suggest a movie
+          </Link>
         )}
         {ownSuggestion && (
           <MovieSuggestionItem suggestion={ownSuggestion} isOwn partyId={partyId} />
@@ -49,16 +56,6 @@ export function MovieSuggestions({ partyId }: { partyId: string }) {
             </button>
           )}
         </div>
-      )}
-
-      {!ownSuggestion && (
-        <Link
-          to="/search"
-          search={{ partyId }}
-          className="block rounded-xl bg-accent-purple py-3 text-sm font-medium text-center"
-        >
-          Suggest a movie
-        </Link>
       )}
     </div>
   );

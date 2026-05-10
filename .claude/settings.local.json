@@ -14,7 +14,8 @@
       "WebFetch(domain:www.doesthedogdie.com)",
       "WebSearch",
       "Bash(awk -F: '{print $NF}')",
-      "Bash(git check-ignore *)"
+      "Bash(git check-ignore *)",
+      "Bash(git mv *)"
     ]
   }
 }

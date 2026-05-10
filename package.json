@@ -14,11 +14,18 @@
     "db:migrate": "pnpm --filter @movie-talkin/api db:migrate",
     "db:seed": "pnpm --filter @movie-talkin/api db:seed",
     "db:fixture": "pnpm --filter @movie-talkin/api db:fixture",
-    "db:studio": "pnpm --filter @movie-talkin/api db:studio"
+    "db:studio": "pnpm --filter @movie-talkin/api db:studio",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,json,css,md}": "prettier --write",
+    "apps/**/src/**/*.{ts,tsx}": "eslint --fix --max-warnings=0"
   },
   "devDependencies": {
     "eslint": "^10.3.0",
     "eslint-config-prettier": "^10.1.8",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.4",
     "prettier": "^3.8.3",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.59.2"

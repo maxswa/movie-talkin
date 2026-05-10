@@ -69,7 +69,7 @@ export function CategorySpinner({
 
   return (
     <div className="flex flex-col items-center gap-4 py-2">
-      <p className="text-xs text-white/50 uppercase tracking-widest">
+      <p className="text-xs text-white/70 uppercase tracking-widest">
         {landed ? 'Winner!' : 'Spinning…'}
       </p>
       <div className="relative w-64 h-64">

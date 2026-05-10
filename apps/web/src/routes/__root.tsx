@@ -19,7 +19,7 @@ function Root() {
             <div className="flex flex-col items-center justify-center h-full gap-4 px-8 text-center">
               <p className="text-4xl">🎬</p>
               <h1 className="text-xl font-semibold">movie-talkin</h1>
-              <p className="text-white/50 text-sm">Open your magic link to sign in.</p>
+              <p className="text-white/70 text-sm">Open your magic link to sign in.</p>
             </div>
           ) : (
             <Outlet />

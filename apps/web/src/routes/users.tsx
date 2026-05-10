@@ -25,7 +25,7 @@ function UsersPage() {
     <div className="flex flex-col gap-6 px-4 py-6">
       <h1 className="text-xl font-semibold">Members</h1>
 
-      {isLoading && <p className="text-center text-sm text-white/40 py-8">Loading…</p>}
+      {isLoading && <p className="text-center text-sm text-white/60 py-8">Loading…</p>}
 
       {!isLoading && (
         <ul className="flex flex-col gap-2">

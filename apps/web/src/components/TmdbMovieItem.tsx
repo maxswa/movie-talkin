@@ -26,7 +26,7 @@ export function TmdbMovieItem({ movie, onSelect, disabled }: Props) {
         )}
         <div className="flex flex-col gap-0.5 min-w-0">
           <p className="text-sm font-medium truncate">{movie.title}</p>
-          {movie.releaseYear && <p className="text-xs text-white/40">{movie.releaseYear}</p>}
+          {movie.releaseYear && <p className="text-xs text-white/60">{movie.releaseYear}</p>}
         </div>
       </button>
     </li>

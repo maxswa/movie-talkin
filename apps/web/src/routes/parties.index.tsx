@@ -44,10 +44,10 @@ function PartiesPage() {
         </button>
       </div>
 
-      {isLoading && <p className="text-center text-sm text-white/40 py-8">Loading…</p>}
+      {isLoading && <p className="text-center text-sm text-white/60 py-8">Loading…</p>}
 
       {!isLoading && sorted.length === 0 && (
-        <p className="text-center text-sm text-white/40 py-8">No parties yet.</p>
+        <p className="text-center text-sm text-white/60 py-8">No parties yet.</p>
       )}
 
       <ul className="flex flex-col gap-2">

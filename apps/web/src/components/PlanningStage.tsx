@@ -54,7 +54,7 @@ export function PlanningStage({ party }: { party: WatchPartyDetail }) {
       {isHost ? (
         <div className="flex flex-col gap-3">
           <label className="flex flex-col gap-1">
-            <span className="text-xs text-white/50">Voting starts at</span>
+            <span className="text-xs text-white/70">Voting starts at</span>
             <input
               key={party.votingStartsAt ?? 'empty'}
               type="datetime-local"
@@ -62,7 +62,7 @@ export function PlanningStage({ party }: { party: WatchPartyDetail }) {
               onChange={handleStartsAtChange}
               className="rounded-xl bg-white/10 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-accent-purple/50 [color-scheme:dark]"
             />
-            <span className="text-[11px] text-white/40">
+            <span className="text-[11px] text-white/60">
               When this time hits, voting opens automatically.
             </span>
           </label>
@@ -77,7 +77,7 @@ export function PlanningStage({ party }: { party: WatchPartyDetail }) {
         <div className="flex flex-col gap-2">
           <VotingCountdown startsAt={party.votingStartsAt} />
           {party.votingDurationMs && (
-            <p className="text-xs text-white/40 text-center">
+            <p className="text-xs text-white/60 text-center">
               Each round will last {formatDuration(party.votingDurationMs)}.
             </p>
           )}
@@ -89,7 +89,7 @@ export function PlanningStage({ party }: { party: WatchPartyDetail }) {
           Movie suggestions
         </h3>
         {suggestions.length === 0 ? (
-          <p className="text-sm text-white/40 py-2">No suggestions.</p>
+          <p className="text-sm text-white/60 py-2">No suggestions.</p>
         ) : (
           <ul className="flex flex-col gap-2">
             {suggestions.map((s) => (
@@ -113,7 +113,7 @@ function VotingCountdown({ startsAt }: { startsAt: string | null }) {
 
   if (!startsAt) {
     return (
-      <div className="rounded-xl bg-white/5 px-4 py-3 text-sm text-white/50 text-center">
+      <div className="rounded-xl bg-white/5 px-4 py-3 text-sm text-white/70 text-center">
         Voting will open soon.
       </div>
     );
@@ -122,7 +122,7 @@ function VotingCountdown({ startsAt }: { startsAt: string | null }) {
   const remaining = new Date(startsAt).getTime() - now;
   if (remaining <= 0) {
     return (
-      <div className="rounded-xl bg-white/5 px-4 py-3 text-sm text-white/50 text-center">
+      <div className="rounded-xl bg-white/5 px-4 py-3 text-sm text-white/70 text-center">
         ⏱ Opening voting…
       </div>
     );
@@ -137,7 +137,7 @@ function VotingCountdown({ startsAt }: { startsAt: string | null }) {
     hours > 0 ? `${hours}:${pad(minutes)}:${pad(seconds)}` : `${minutes}:${pad(seconds)}`;
 
   return (
-    <div className="rounded-xl bg-accent-purple/15 px-4 py-3 text-sm text-white text-center">
+    <div className="rounded-xl bg-accent-purple/25 ring-1 ring-accent-purple/40 px-4 py-3 text-sm text-white text-center">
       🎬 Voting opens in <span className="font-mono font-semibold">{formatted}</span>
     </div>
   );

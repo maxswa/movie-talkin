@@ -97,7 +97,7 @@ function PartyDetailPage() {
   if (isLoading || !party) {
     return (
       <div className="flex items-center justify-center h-40">
-        <p className="text-sm text-white/40">Loading…</p>
+        <p className="text-sm text-white/60">Loading…</p>
       </div>
     );
   }
@@ -114,7 +114,7 @@ function PartyDetailPage() {
               router.navigate({ to: '/' });
             }
           }}
-          className="self-start flex items-center gap-2 text-sm text-white/50 hover:text-white transition-colors"
+          className="self-start flex items-center gap-2 text-sm text-white/70 hover:text-white transition-colors"
           aria-label="Back"
         >
           <span className="text-lg leading-none">←</span>
@@ -124,7 +124,7 @@ function PartyDetailPage() {
       </div>
 
       <header className="flex flex-col gap-3">
-        {updateMutation.isPending && <span className="text-xs text-white/30">Saving…</span>}
+        {updateMutation.isPending && <span className="text-xs text-white/45">Saving…</span>}
         <h1 className="text-2xl font-semibold leading-tight">
           {party.selectedCategory ?? 'Category TBD'}
         </h1>
@@ -138,7 +138,7 @@ function PartyDetailPage() {
           />
         ) : (
           party.scheduledFor && (
-            <p className="text-sm text-white/50">📅 {formatDate(party.scheduledFor)}</p>
+            <p className="text-sm text-white/70">📅 {formatDate(party.scheduledFor)}</p>
           )
         )}
         {party.status === 'voting' && currentEndsAt && <RoundCountdown endsAt={currentEndsAt} />}

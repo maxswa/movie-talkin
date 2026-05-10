@@ -55,14 +55,14 @@ export function AddMemberForm({ groupId }: Props) {
           onChange={(e) => setName(e.target.value)}
           placeholder="Name *"
           required
-          className="rounded-xl bg-white/10 px-4 py-3 text-sm placeholder:text-white/30 outline-none focus:ring-2 focus:ring-accent-purple/50"
+          className="rounded-xl bg-white/10 px-4 py-3 text-sm placeholder:text-white/45 outline-none focus:ring-2 focus:ring-accent-purple/50"
         />
         <input
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Email (optional)"
           type="email"
-          className="rounded-xl bg-white/10 px-4 py-3 text-sm placeholder:text-white/30 outline-none focus:ring-2 focus:ring-accent-purple/50"
+          className="rounded-xl bg-white/10 px-4 py-3 text-sm placeholder:text-white/45 outline-none focus:ring-2 focus:ring-accent-purple/50"
         />
         <div className="flex rounded-xl overflow-hidden border border-white/10 text-sm">
           {(['guest', 'host'] as const).map((r) => (
@@ -73,7 +73,7 @@ export function AddMemberForm({ groupId }: Props) {
               className={`flex-1 py-3 font-medium transition-colors capitalize ${
                 role === r
                   ? 'bg-accent-purple text-white'
-                  : 'bg-white/5 text-white/40 hover:text-white'
+                  : 'bg-white/5 text-white/60 hover:text-white'
               }`}
             >
               {r}
@@ -94,9 +94,9 @@ export function AddMemberForm({ groupId }: Props) {
 
       {magicLink && (
         <div className="flex flex-col gap-1">
-          <p className="text-xs text-white/50">Share this link with the new member:</p>
+          <p className="text-xs text-white/70">Share this link with the new member:</p>
           <div className="flex items-center gap-2 rounded-lg bg-white/5 px-3 py-2">
-            <span className="flex-1 truncate text-xs text-white/50 font-mono">{magicLink}</span>
+            <span className="flex-1 truncate text-xs text-white/70 font-mono">{magicLink}</span>
             <button
               onClick={copyLink}
               className="shrink-0 text-xs text-accent-blue hover:text-white transition-colors"

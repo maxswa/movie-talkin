@@ -37,7 +37,7 @@ export function ContentWarnings({
           {warnings.map((w) => (
             <li key={w.name} className="flex items-center justify-between gap-2">
               <span className="truncate">{w.name}</span>
-              <span className="text-white/30 shrink-0">
+              <span className="text-white/45 shrink-0">
                 {w.yes}/{w.yes + w.no}
               </span>
             </li>

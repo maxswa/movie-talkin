@@ -44,7 +44,7 @@ export function MemberRow({ member, groupId, isLastHost }: Props) {
             className={`rounded-full px-2 py-0.5 text-xs font-medium ${
               member.role === 'host'
                 ? 'bg-accent-purple/20 text-accent-purple'
-                : 'bg-white/10 text-white/40'
+                : 'bg-white/10 text-white/60'
             }`}
           >
             {member.role}
@@ -79,7 +79,7 @@ export function MemberRow({ member, groupId, isLastHost }: Props) {
               </button>
               <button
                 onClick={() => setConfirming(false)}
-                className="text-xs text-white/40 hover:text-white"
+                className="text-xs text-white/60 hover:text-white"
               >
                 Cancel
               </button>
@@ -90,7 +90,7 @@ export function MemberRow({ member, groupId, isLastHost }: Props) {
 
       {magicLink && (
         <div className="flex items-center gap-2 rounded-lg bg-white/5 px-3 py-2">
-          <span className="flex-1 truncate text-xs text-white/50 font-mono">{magicLink}</span>
+          <span className="flex-1 truncate text-xs text-white/70 font-mono">{magicLink}</span>
           <button
             onClick={copyLink}
             className="shrink-0 text-xs text-accent-blue hover:text-white transition-colors"

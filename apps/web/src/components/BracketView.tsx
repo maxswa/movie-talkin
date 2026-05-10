@@ -51,7 +51,7 @@ export function BracketView({ party }: { party: WatchParty }) {
   }, [currentEndsAt, partyId, queryClient]);
 
   if (rounds.length === 0) {
-    return <p className="text-white/40 text-sm text-center py-8">Brackets are being set up…</p>;
+    return <p className="text-white/60 text-sm text-center py-8">Brackets are being set up…</p>;
   }
 
   return (
@@ -80,7 +80,7 @@ export function BracketView({ party }: { party: WatchParty }) {
             helperText="Updates the current round's deadline and applies to future rounds."
           />
           {updateDurationMutation.isPending && (
-            <p className="text-xs text-white/30">Saving duration…</p>
+            <p className="text-xs text-white/45">Saving duration…</p>
           )}
           {closeRoundMutation.isError && (
             <p className="text-xs text-red-400">{(closeRoundMutation.error as Error).message}</p>

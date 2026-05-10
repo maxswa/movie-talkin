@@ -35,14 +35,14 @@ export function PartyCard({ party }: { party: WatchPartyDetail }) {
       </div>
 
       {party.scheduledFor && (
-        <p className="text-white/50 text-sm">📅 {formatDate(party.scheduledFor)}</p>
+        <p className="text-white/70 text-sm">📅 {formatDate(party.scheduledFor)}</p>
       )}
 
       {isVoting && currentEndsAt && <RoundCountdown endsAt={currentEndsAt} />}
 
       <PartyPreview party={party} rounds={rounds} />
 
-      <p className="text-xs text-white/40 text-right">Tap to open →</p>
+      <p className="text-xs text-white/60 text-right">Tap to open →</p>
     </Link>
   );
 }
@@ -56,34 +56,34 @@ function PartyPreview({
 }) {
   switch (party.status) {
     case 'draft':
-      return <p className="text-sm text-white/50">Your host is planning the next party</p>;
+      return <p className="text-sm text-white/70">Your host is planning the next party</p>;
 
     case 'open_for_category_suggestions':
-      return <p className="text-sm text-white/50">Members are suggesting categories</p>;
+      return <p className="text-sm text-white/70">Members are suggesting categories</p>;
 
     case 'category_suggestions_closed':
-      return <p className="text-sm text-white/50">Movie suggestions opening soon…</p>;
+      return <p className="text-sm text-white/70">Movie suggestions opening soon…</p>;
 
     case 'open_for_movie_suggestions':
-      return <p className="text-sm text-white/50">Members are suggesting movies</p>;
+      return <p className="text-sm text-white/70">Members are suggesting movies</p>;
 
     case 'movie_suggestions_closed':
       return party.votingStartsAt ? (
         <VotingStartsCountdown startsAt={party.votingStartsAt} />
       ) : (
-        <p className="text-sm text-white/50">Voting will open shortly…</p>
+        <p className="text-sm text-white/70">Voting will open shortly…</p>
       );
 
     case 'voting': {
       if (rounds.length === 0) {
-        return <p className="text-sm text-white/50">Brackets being set up…</p>;
+        return <p className="text-sm text-white/70">Brackets being set up…</p>;
       }
       const currentRound = Math.max(...rounds.map((r) => r.round));
       const data = rounds.find((r) => r.round === currentRound);
       const open = data?.brackets.filter((b) => b.winnerId === null).length ?? 0;
       const total = data?.brackets.length ?? 0;
       return (
-        <p className="text-sm text-white/50">
+        <p className="text-sm text-white/70">
           Round {currentRound} · {open} of {total} match{total === 1 ? '' : 'es'} still open
         </p>
       );
@@ -107,8 +107,8 @@ function PartyPreview({
           )}
           <div className="min-w-0 flex-1">
             <p className="text-sm font-medium truncate">{movie.title}</p>
-            {movie.releaseYear && <p className="text-xs text-white/50">{movie.releaseYear}</p>}
-            <p className="text-xs text-white/40 truncate">Picked by {movie.suggestedBy.name}</p>
+            {movie.releaseYear && <p className="text-xs text-white/70">{movie.releaseYear}</p>}
+            <p className="text-xs text-white/60 truncate">Picked by {movie.suggestedBy.name}</p>
           </div>
         </div>
       );
@@ -127,13 +127,13 @@ function VotingStartsCountdown({ startsAt }: { startsAt: string }) {
   }, []);
 
   const remainingMs = new Date(startsAt).getTime() - now;
-  if (remainingMs <= 0) return <p className="text-sm text-white/50">Voting opening…</p>;
+  if (remainingMs <= 0) return <p className="text-sm text-white/70">Voting opening…</p>;
   if (remainingMs < 60_000) {
-    return <p className="text-sm text-white/50">Voting will start in less than a minute.</p>;
+    return <p className="text-sm text-white/70">Voting will start in less than a minute.</p>;
   }
 
   return (
-    <p className="text-sm text-white/50">
+    <p className="text-sm text-white/70">
       Voting will start in {formatRelativeUntil(remainingMs)}.
     </p>
   );

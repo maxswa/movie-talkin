@@ -66,7 +66,7 @@ function Home() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-full text-white/40 text-sm">Loading…</div>
+      <div className="flex items-center justify-center h-full text-white/60 text-sm">Loading…</div>
     );
   }
 
@@ -90,7 +90,7 @@ function Home() {
           )}
           <button
             onClick={() => api.auth.logout().then(() => window.location.reload())}
-            className="text-white/30 text-xs hover:text-white/60 transition-colors"
+            className="text-white/45 text-xs hover:text-white/60 transition-colors"
           >
             Sign out
           </button>
@@ -101,7 +101,7 @@ function Home() {
         <div className="flex flex-col items-center gap-3 py-20 text-center">
           <p className="text-5xl">🎬</p>
           <p className="font-semibold text-white/80">No upcoming party yet</p>
-          <p className="text-white/40 text-sm">Your host will set one up soon.</p>
+          <p className="text-white/60 text-sm">Your host will set one up soon.</p>
         </div>
       ) : (
         <PartyCard party={partyDetail} />

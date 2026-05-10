@@ -28,7 +28,7 @@ export function BracketVoteBreakdown({
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-1 text-[11px] font-medium text-white/40 hover:text-white/70 transition-colors"
+        className="flex items-center gap-1 text-[11px] font-medium text-white/60 hover:text-white/70 transition-colors"
       >
         <span className={`transition-transform ${open ? 'rotate-90' : ''}`}>›</span>
         {open ? 'Hide vote breakdown' : 'Show vote breakdown'}
@@ -37,7 +37,7 @@ export function BracketVoteBreakdown({
       {open && (
         <div className="mt-2 flex flex-col gap-2 text-xs">
           {isLoading ? (
-            <p className="text-white/30">Loading…</p>
+            <p className="text-white/45">Loading…</p>
           ) : (
             <>
               <VoterRow title={bracket.suggestionA.title} voters={aVoters} />
@@ -53,9 +53,9 @@ export function BracketVoteBreakdown({
 function VoterRow({ title, voters }: { title: string; voters: string[] }) {
   return (
     <div className="flex flex-col gap-0.5">
-      <p className="text-white/50 truncate">{title}</p>
+      <p className="text-white/70 truncate">{title}</p>
       {voters.length === 0 ? (
-        <p className="text-white/30 italic">No votes</p>
+        <p className="text-white/45 italic">No votes</p>
       ) : (
         <p className="text-white/70">{voters.join(', ')}</p>
       )}

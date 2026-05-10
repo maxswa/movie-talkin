@@ -13,7 +13,7 @@ export function BracketTree({ rounds }: { rounds: BracketRound[] }) {
             key={round}
             className="flex flex-col shrink-0 w-[170px]"
           >
-            <p className="text-[10px] text-white/40 uppercase tracking-widest text-center mb-2">
+            <p className="text-[10px] text-white/60 uppercase tracking-widest text-center mb-2">
               {round === finalRound ? 'Final' : `Round ${round}`}
             </p>
             <div className="flex flex-col flex-1 justify-around gap-3">
@@ -43,7 +43,7 @@ function TreeMatch({ bracket }: { bracket: Bracket }) {
           showCount={false}
           showSuggester={true}
         />
-        <p className="text-[10px] text-white/30 text-center pt-1">bye</p>
+        <p className="text-[10px] text-white/45 text-center pt-1">bye</p>
       </div>
     );
   }
@@ -108,7 +108,7 @@ function TreeOption({
       <div className="flex flex-col min-w-0 flex-1">
         <p className="text-xs font-medium truncate leading-tight">{suggestion.title}</p>
         {showSuggester && (
-          <p className="text-[10px] text-white/40 truncate leading-tight">
+          <p className="text-[10px] text-white/60 truncate leading-tight">
             by {suggestion.suggestedBy.name}
           </p>
         )}

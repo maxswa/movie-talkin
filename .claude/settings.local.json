@@ -12,7 +12,8 @@
       "Bash(Select-Object Name)",
       "Bash(git stash *)",
       "WebFetch(domain:www.doesthedogdie.com)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(awk -F: '{print $NF}')"
     ]
   }
 }

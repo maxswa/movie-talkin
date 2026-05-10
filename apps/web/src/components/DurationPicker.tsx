@@ -22,7 +22,7 @@ export function DurationPicker({
 }) {
   return (
     <label className="flex flex-col gap-1">
-      <span className="text-xs text-white/50">{label}</span>
+      <span className="text-xs text-white/70">{label}</span>
       <select
         value={value === null ? '' : String(value)}
         onChange={(e) => onChange(e.target.value === '' ? null : Number(e.target.value))}
@@ -35,7 +35,7 @@ export function DurationPicker({
         ))}
       </select>
       {helperText && (
-        <span className="text-[11px] text-white/40">
+        <span className="text-[11px] text-white/60">
           {value ? helperText : 'Each round will stay open until manually closed.'}
         </span>
       )}

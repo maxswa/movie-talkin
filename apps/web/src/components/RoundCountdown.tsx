@@ -15,7 +15,7 @@ export function RoundCountdown({ endsAt }: { endsAt: string | null }) {
 
   if (remainingMs <= 0) {
     return (
-      <div className="rounded-xl bg-white/5 px-4 py-2 text-sm text-white/50 text-center">
+      <div className="rounded-xl bg-white/5 px-4 py-2 text-sm text-white/70 text-center">
         ⏱ Closing round…
       </div>
     );

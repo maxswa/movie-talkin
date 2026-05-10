@@ -22,7 +22,7 @@ export function PartyBody({ party }: { party: WatchPartyDetail }) {
   switch (party.status) {
     case 'draft':
       return (
-        <p className="text-white/40 text-sm text-center py-8">
+        <p className="text-white/60 text-sm text-center py-8">
           Your host is planning the next party…
         </p>
       );
@@ -33,11 +33,11 @@ export function PartyBody({ party }: { party: WatchPartyDetail }) {
     case 'category_suggestions_closed':
       return (
         <div className="flex flex-col items-center gap-3 py-6 rounded-2xl bg-surface">
-          <p className="text-white/40 text-xs uppercase tracking-widest">Category</p>
+          <p className="text-white/60 text-xs uppercase tracking-widest">Category</p>
           <span className="rounded-full bg-accent-purple/20 text-accent-purple px-5 py-2 text-sm font-medium">
             {party.selectedCategory}
           </span>
-          <p className="text-white/40 text-sm mt-1">Movie suggestions opening soon…</p>
+          <p className="text-white/60 text-sm mt-1">Movie suggestions opening soon…</p>
         </div>
       );
 
@@ -57,11 +57,17 @@ export function PartyBody({ party }: { party: WatchPartyDetail }) {
       const poster = tmdbImageUrl(movie.posterPath);
       return (
         <div className="flex flex-col items-center gap-4 py-4">
-          {poster && <img src={poster} alt={movie.title} className="w-36 rounded-xl shadow-2xl" />}
+          {poster && (
+            <img
+              src={poster}
+              alt={movie.title}
+              className="w-36 rounded-xl ring-2 ring-accent-amber/60 shadow-2xl shadow-accent-amber/30"
+            />
+          )}
           <div className="text-center">
             <p className="font-semibold text-lg leading-snug">{movie.title}</p>
-            {movie.releaseYear && <p className="text-white/40 text-sm">{movie.releaseYear}</p>}
-            <p className="text-white/50 text-xs mt-2">Suggested by {movie.suggestedBy.name}</p>
+            {movie.releaseYear && <p className="text-white/60 text-sm">{movie.releaseYear}</p>}
+            <p className="text-white/70 text-xs mt-2">Suggested by {movie.suggestedBy.name}</p>
           </div>
           <ContentWarnings title={movie.title} year={movie.releaseYear} />
         </div>

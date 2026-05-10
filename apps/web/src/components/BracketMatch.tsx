@@ -40,7 +40,7 @@ export function BracketMatch({ bracket, partyId, roundClosed, eligibleVoterCount
         )}
         <div className="flex flex-col gap-0.5 min-w-0">
           <p className="text-sm font-medium truncate">{bracket.suggestionA.title}</p>
-          <p className="text-xs text-white/40">Auto-advanced</p>
+          <p className="text-xs text-white/60">Auto-advanced</p>
         </div>
       </div>
     );
@@ -72,7 +72,7 @@ export function BracketMatch({ bracket, partyId, roundClosed, eligibleVoterCount
         />
       </div>
       {showCounter && (
-        <p className="mt-2 text-center text-[11px] text-white/40">
+        <p className="mt-2 text-center text-[11px] text-white/60">
           {bracket.voterCount}/{eligibleVoterCount} voted
         </p>
       )}

@@ -27,9 +27,9 @@ export function MovieSuggestionItem({ suggestion, isOwn, partyId }: Props) {
       <div className="flex flex-col gap-0.5 min-w-0 flex-1">
         <p className="text-sm font-medium truncate">{suggestion.title}</p>
         {suggestion.releaseYear && (
-          <p className="text-xs text-white/40">{suggestion.releaseYear}</p>
+          <p className="text-xs text-white/60">{suggestion.releaseYear}</p>
         )}
-        <p className="text-xs text-white/40">{suggestion.suggestedBy.name}</p>
+        <p className="text-xs text-white/60">{suggestion.suggestedBy.name}</p>
       </div>
       {isOwn && partyId && (
         <Link

@@ -23,7 +23,7 @@ export function MovieSuggestions({ partyId }: { partyId: string }) {
     <div className="flex flex-col gap-4 rounded-2xl bg-surface p-5">
       <ul className="flex flex-col gap-2">
         {!ownSuggestion && !showAll && (
-          <li className="text-white/30 text-sm text-center py-4">No movies suggested yet.</li>
+          <li className="text-white/45 text-sm text-center py-4">No movies suggested yet.</li>
         )}
         {ownSuggestion && (
           <MovieSuggestionItem suggestion={ownSuggestion} isOwn partyId={partyId} />
@@ -36,7 +36,7 @@ export function MovieSuggestions({ partyId }: { partyId: string }) {
 
       {otherSuggestions.length > 0 && (
         <div className="flex items-center justify-between">
-          <p className="text-xs text-white/40">
+          <p className="text-xs text-white/60">
             {otherSuggestions.length} {otherSuggestions.length === 1 ? 'other has' : 'others have'}{' '}
             suggested a movie
           </p>

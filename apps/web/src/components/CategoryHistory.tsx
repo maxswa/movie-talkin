@@ -14,11 +14,11 @@ export function CategoryHistory({
   });
 
   if (isLoading) {
-    return <p className="text-white/30 text-sm text-center py-3">Loading…</p>;
+    return <p className="text-white/45 text-sm text-center py-3">Loading…</p>;
   }
 
   if (suggestions.length === 0) {
-    return <p className="text-white/30 text-sm text-center py-3">No suggestions.</p>;
+    return <p className="text-white/45 text-sm text-center py-3">No suggestions.</p>;
   }
 
   return (
@@ -33,7 +33,7 @@ export function CategoryHistory({
             }`}
           >
             <span className="text-sm font-medium">{s.name}</span>
-            <span className="text-xs text-white/40">{s.suggestedBy.name}</span>
+            <span className="text-xs text-white/60">{s.suggestedBy.name}</span>
           </li>
         );
       })}

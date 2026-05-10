@@ -24,7 +24,7 @@ export function BracketBreakdowns({
     <div className="flex flex-col gap-4">
       {resolvedRounds.map(({ round, brackets }) => (
         <div key={round} className="flex flex-col gap-2">
-          <p className="text-xs text-white/40 uppercase tracking-widest">Round {round}</p>
+          <p className="text-xs text-white/60 uppercase tracking-widest">Round {round}</p>
           {brackets.map((bracket) => (
             <BreakdownRow key={bracket.id} partyId={partyId} bracket={bracket} />
           ))}
@@ -39,16 +39,16 @@ function BreakdownRow({ partyId, bracket }: { partyId: string; bracket: Bracket 
   return (
     <div className="rounded-xl bg-surface p-3">
       <div className="flex items-center gap-2 text-sm">
-        <span className={`flex-1 truncate ${aWon ? 'font-semibold' : 'text-white/50'}`}>
+        <span className={`flex-1 truncate ${aWon ? 'font-semibold' : 'text-white/70'}`}>
           {bracket.suggestionA.title}
-          <span className="text-white/40 ml-1">({bracket.voteCountA})</span>
+          <span className="text-white/60 ml-1">({bracket.voteCountA})</span>
         </span>
-        <span className="text-white/30 text-xs shrink-0">vs</span>
+        <span className="text-white/45 text-xs shrink-0">vs</span>
         <span
-          className={`flex-1 truncate text-right ${aWon ? 'text-white/50' : 'font-semibold'}`}
+          className={`flex-1 truncate text-right ${aWon ? 'text-white/70' : 'font-semibold'}`}
         >
           {bracket.suggestionB.title}
-          <span className="text-white/40 ml-1">({bracket.voteCountB})</span>
+          <span className="text-white/60 ml-1">({bracket.voteCountB})</span>
         </span>
       </div>
       <BracketVoteBreakdown partyId={partyId} bracket={bracket} />

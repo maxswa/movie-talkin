@@ -16,11 +16,11 @@ export function PartyListItem({ party }: { party: WatchParty }) {
           <StatusBadge status={party.status} />
         </div>
         {party.scheduledFor && (
-          <span className="text-xs text-white/40">{formatDate(party.scheduledFor)}</span>
+          <span className="text-xs text-white/60">{formatDate(party.scheduledFor)}</span>
         )}
       </div>
       <svg
-        className="w-4 h-4 text-white/30"
+        className="w-4 h-4 text-white/45"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"

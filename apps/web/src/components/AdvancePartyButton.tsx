@@ -57,7 +57,7 @@ export function AdvancePartyButton({ party }: { party: WatchParty }) {
             {spinMutation.isPending ? 'Spinning…' : '🎰 Spin to pick category'}
           </button>
           {!canSpin && (
-            <p className="text-xs text-white/40 text-center">
+            <p className="text-xs text-white/60 text-center">
               Need at least one suggestion to spin.
             </p>
           )}

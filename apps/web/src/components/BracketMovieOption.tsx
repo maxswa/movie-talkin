@@ -47,7 +47,7 @@ export function BracketMovieOption({
         {suggestion.title}
       </p>
       {showCount && (
-        <p className={`text-xs font-semibold ${isWinner ? 'text-green-400' : 'text-white/40'}`}>
+        <p className={`text-xs font-semibold ${isWinner ? 'text-green-400' : 'text-white/60'}`}>
           {voteCount} {voteCount === 1 ? 'vote' : 'votes'}
         </p>
       )}

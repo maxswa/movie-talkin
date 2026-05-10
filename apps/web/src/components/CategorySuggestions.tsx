@@ -21,7 +21,7 @@ function SuggestionRow({
     >
       <span className="text-sm font-medium">{suggestion.name}</span>
       <div className="flex items-center gap-3">
-        <span className="text-xs text-white/40">{suggestion.suggestedBy.name}</span>
+        <span className="text-xs text-white/60">{suggestion.suggestedBy.name}</span>
         {isOwn && (
           <button
             onClick={onEdit}
@@ -102,7 +102,7 @@ export function CategorySuggestions({ partyId }: { partyId: string }) {
     <div className="flex flex-col gap-4 rounded-2xl bg-surface p-5">
       <ul className="flex flex-col gap-2">
         {suggestions.length === 0 && (
-          <li className="text-white/30 text-sm text-center py-4">
+          <li className="text-white/45 text-sm text-center py-4">
             No suggestions yet — be the first!
           </li>
         )}
@@ -123,7 +123,7 @@ export function CategorySuggestions({ partyId }: { partyId: string }) {
             onChange={(e) => setInput(e.target.value)}
             placeholder={editing ? 'Update your suggestion…' : 'Suggest a category…'}
             autoFocus={editing}
-            className="flex-1 rounded-xl bg-white/10 px-4 py-3 text-sm placeholder:text-white/30 outline-none focus:ring-2 focus:ring-accent-purple/50"
+            className="flex-1 rounded-xl bg-white/10 px-4 py-3 text-sm placeholder:text-white/45 outline-none focus:ring-2 focus:ring-accent-purple/50"
           />
           <button
             type="submit"

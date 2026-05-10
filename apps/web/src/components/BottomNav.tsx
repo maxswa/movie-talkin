@@ -17,7 +17,7 @@ export function BottomNav() {
             key={to}
             to={to}
             className={`flex flex-col items-center gap-1 px-6 py-3 text-xs transition-colors ${
-              active ? 'text-accent-purple' : 'text-white/40 hover:text-white/70'
+              active ? 'text-accent-purple' : 'text-white/60 hover:text-white/70'
             }`}
           >
             <Icon className="h-5 w-5" />

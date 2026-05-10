@@ -47,7 +47,7 @@ function Search() {
       <div className="flex items-center gap-3 pt-2">
         <button
           onClick={() => navigate({ to: '/' })}
-          className="text-white/50 hover:text-white transition-colors text-xl leading-none"
+          className="text-white/70 hover:text-white transition-colors text-xl leading-none"
           aria-label="Back"
         >
           ←
@@ -60,7 +60,7 @@ function Search() {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Search for a movie…"
-        className="rounded-xl bg-white/10 px-4 py-3 text-sm placeholder:text-white/30 outline-none focus:ring-2 focus:ring-accent-purple/50"
+        className="rounded-xl bg-white/10 px-4 py-3 text-sm placeholder:text-white/45 outline-none focus:ring-2 focus:ring-accent-purple/50"
       />
 
       {results.length > 0 && (
@@ -77,7 +77,7 @@ function Search() {
       )}
 
       {debouncedQuery.length >= 2 && results.length === 0 && (
-        <p className="text-white/30 text-sm text-center py-4">No results found.</p>
+        <p className="text-white/45 text-sm text-center py-4">No results found.</p>
       )}
     </div>
   );

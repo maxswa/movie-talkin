@@ -24,7 +24,7 @@ export function BracketRound({
         isCurrentRound ? '' : 'opacity-50'
       }`}
     >
-      <p className="text-xs text-white/40 uppercase tracking-widest">
+      <p className="text-xs text-white/60 uppercase tracking-widest">
         Round {round}
         {isCurrentRound ? ' · current' : ''}
       </p>

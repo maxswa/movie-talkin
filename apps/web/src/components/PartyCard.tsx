@@ -10,6 +10,7 @@ import { StatusBadge } from './StatusBadge';
 const INTERACTIVE_STATUSES = new Set([
   'open_for_category_suggestions',
   'open_for_movie_suggestions',
+  'movie_suggestions_closed',
   'voting',
 ]);
 

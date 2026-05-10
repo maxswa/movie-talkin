@@ -15,7 +15,8 @@ export function BracketBreakdowns({
         (b) => b.winnerId !== null && b.suggestionA.id !== b.suggestionB.id,
       ),
     }))
-    .filter((r) => r.brackets.length > 0);
+    .filter((r) => r.brackets.length > 0)
+    .sort((a, b) => b.round - a.round);
 
   if (resolvedRounds.length === 0) return null;
 

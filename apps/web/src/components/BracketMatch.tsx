@@ -28,7 +28,7 @@ export function BracketMatch({ bracket, partyId, roundClosed, eligibleVoterCount
   if (isBye) {
     const poster = tmdbImageUrl(bracket.suggestionA.posterPath, 'w92');
     return (
-      <div className="flex items-center gap-3 rounded-2xl bg-surface p-4">
+      <div className="flex items-center gap-3 rounded-2xl bg-white/5 p-4">
         {poster ? (
           <img
             src={poster}
@@ -47,7 +47,7 @@ export function BracketMatch({ bracket, partyId, roundClosed, eligibleVoterCount
   }
 
   return (
-    <div className="rounded-2xl bg-surface p-4">
+    <div className="rounded-2xl bg-white/5 p-4">
       <div className="flex items-stretch gap-2">
         <BracketMovieOption
           suggestion={bracket.suggestionA}

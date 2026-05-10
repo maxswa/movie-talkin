@@ -14,7 +14,7 @@
 - [x] 8 — Go back a status (medium)
 - [x] 9 — Fuzzy TMDB search (small-medium)
 - [x] 10 — Healing WebSocket connection + more event types (medium)
-- [ ] 11 — "Voting soon" as a planning stage with per-round scheduling (high)
+- [x] 11 — "Voting soon" as a planning stage with per-round scheduling (high) — MVP: round-1 start time only; per-round end-time planning deferred
 
 ---
 

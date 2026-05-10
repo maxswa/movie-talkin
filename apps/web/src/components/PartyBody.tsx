@@ -5,6 +5,7 @@ import { CategorySpinner } from './CategorySpinner';
 import { CategorySuggestions } from './CategorySuggestions';
 import { ContentWarnings } from './ContentWarnings';
 import { MovieSuggestions } from './MovieSuggestions';
+import { PlanningStage } from './PlanningStage';
 
 export function PartyBody({ party }: { party: WatchPartyDetail }) {
   const { data: spin } = useQuery<CategorySpinPayload | null>({
@@ -44,14 +45,10 @@ export function PartyBody({ party }: { party: WatchPartyDetail }) {
       return <MovieSuggestions partyId={party.id} />;
 
     case 'movie_suggestions_closed':
-      return (
-        <p className="text-white/40 text-sm text-center py-8">
-          Suggestions are in — voting coming soon.
-        </p>
-      );
+      return <PlanningStage party={party} />;
 
     case 'voting':
-      return <BracketView partyId={party.id} />;
+      return <BracketView party={party} />;
 
     case 'movie_selected':
     case 'watched': {

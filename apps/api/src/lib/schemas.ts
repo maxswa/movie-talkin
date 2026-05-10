@@ -51,6 +51,8 @@ export const WatchPartySchema = z.object({
   scheduledFor: z.string().nullable(),
   selectedCategory: z.string().nullable(),
   winningSuggestionId: z.string().nullable(),
+  votingStartsAt: z.string().nullable(),
+  votingDurationMs: z.number().nullable(),
   createdAt: z.string(),
 });
 

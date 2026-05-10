@@ -1,15 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
 import { api, WatchParty } from '../lib/api';
 import { nextStatus, WATCH_PARTY_STATUSES } from '../lib/utils';
-import { RoundDeadlinePicker } from './RoundDeadlinePicker';
 import { STATUS_META } from './StatusBadge';
 
 export function AdvancePartyButton({ party }: { party: WatchParty }) {
   const queryClient = useQueryClient();
   const isCategoryPhase = party.status === 'open_for_category_suggestions';
-  const isStartingVote = party.status === 'movie_suggestions_closed';
-  const [deadline, setDeadline] = useState<Date | null>(null);
+  // During voting, "advance" would be voting → movie_selected, which the API rejects in
+  // favor of POST /brackets/close-round. The "Close round & advance" button in BracketView
+  // is the right way to drive that transition.
+  const hideAdvance = party.status === 'voting';
 
   const { data: categorySuggestions = [] } = useQuery({
     queryKey: ['category-suggestions', party.id],
@@ -18,13 +18,7 @@ export function AdvancePartyButton({ party }: { party: WatchParty }) {
   });
 
   const advanceMutation = useMutation({
-    mutationFn: () => {
-      if (isStartingVote && deadline) {
-        const durationMs = deadline.getTime() - Date.now();
-        if (durationMs > 0) return api.parties.advance(party.id, { durationMs });
-      }
-      return api.parties.advance(party.id);
-    },
+    mutationFn: () => api.parties.advance(party.id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['parties'] });
       queryClient.invalidateQueries({ queryKey: ['party', party.id] });
@@ -92,11 +86,8 @@ export function AdvancePartyButton({ party }: { party: WatchParty }) {
         </>
       )}
 
-      {next && !isCategoryPhase && nextLabel && (
+      {next && !isCategoryPhase && !hideAdvance && nextLabel && (
         <>
-          {isStartingVote && (
-            <RoundDeadlinePicker value={deadline} onChange={setDeadline} />
-          )}
           <button
             onClick={() => {
               if (window.confirm(`Advance to "${nextLabel}"?`)) {
@@ -121,7 +112,7 @@ export function AdvancePartyButton({ party }: { party: WatchParty }) {
           disabled={backMutation.isPending}
           className="self-start text-xs text-white/40 hover:text-white/70 disabled:opacity-40 transition-colors"
         >
-          {backMutation.isPending ? 'Reverting…' : `← Back to "${previousLabel}"`}
+          {backMutation.isPending ? 'Reverting…' : `← Revert to "${previousLabel}"`}
         </button>
       )}
 

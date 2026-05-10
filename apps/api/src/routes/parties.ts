@@ -27,8 +27,11 @@ import { requireAuth } from '../middleware/auth.js';
 import { broadcast } from '../lib/pubsub.js';
 import {
   cancelAutoClose,
+  cancelParty,
   registerCloseRound,
+  registerHandler,
   scheduleAutoClose,
+  scheduleParty,
 } from '../lib/round-scheduler.js';
 import type { AppEnv } from '../lib/types.js';
 
@@ -172,6 +175,30 @@ registerCloseRound(async (partyId) => {
   await performCloseRound(partyId, { nextDurationMs });
 });
 
+registerHandler('advance', async (partyId) => {
+  const party = await db.query.watchParties.findFirst({
+    where: eq(watchParties.id, partyId),
+  });
+  if (!party) return;
+
+  try {
+    await generateRoundOneBrackets(partyId);
+  } catch (err) {
+    console.error(`Auto-advance for ${partyId}: failed to generate brackets`, err);
+    return;
+  }
+  await db
+    .update(watchParties)
+    .set({ status: 'voting', votingStartsAt: null })
+    .where(eq(watchParties.id, partyId));
+
+  if (party.votingDurationMs && party.votingDurationMs > 0) {
+    await applyRoundDeadline(partyId, 1, party.votingDurationMs);
+  }
+
+  broadcast(partyId, { type: 'status_changed' });
+});
+
 // ---------------------------------------------------------------------------
 // Router
 // ---------------------------------------------------------------------------
@@ -273,6 +300,8 @@ partiesRouter.openapi(
           'application/json': {
             schema: z.object({
               scheduledFor: z.string().nullable().optional(),
+              votingStartsAt: z.string().nullable().optional(),
+              votingDurationMs: z.number().int().positive().nullable().optional(),
             }),
           },
         },
@@ -306,11 +335,49 @@ partiesRouter.openapi(
     if (!party) return c.json({ error: 'Party not found' }, 404);
     if (!member || member.role !== 'host') return c.json({ error: 'Forbidden' }, 403);
 
+    const updates: Partial<typeof watchParties.$inferInsert> = {};
+    if (body.scheduledFor !== undefined) updates.scheduledFor = body.scheduledFor;
+    if (body.votingStartsAt !== undefined) updates.votingStartsAt = body.votingStartsAt;
+    if (body.votingDurationMs !== undefined) updates.votingDurationMs = body.votingDurationMs;
+
     const [updated] = await db
       .update(watchParties)
-      .set({ scheduledFor: body.scheduledFor })
+      .set(updates)
       .where(eq(watchParties.id, partyId))
       .returning();
+
+    if (body.votingStartsAt !== undefined && party.status === 'movie_suggestions_closed') {
+      cancelParty(partyId);
+      if (body.votingStartsAt) {
+        scheduleParty(partyId, new Date(body.votingStartsAt), 'advance');
+      }
+    }
+
+    // Mid-voting duration change: re-stamp the current round's deadline
+    // (relative to when the round started) and reschedule the auto-close.
+    if (body.votingDurationMs !== undefined && party.status === 'voting') {
+      const allBrackets = await db.query.brackets.findMany({
+        where: eq(brackets.watchPartyId, partyId),
+      });
+      if (allBrackets.length > 0) {
+        const currentRound = Math.max(...allBrackets.map((b) => b.round));
+        const roundBrackets = allBrackets.filter((b) => b.round === currentRound);
+        const roundStarted = new Date(roundBrackets[0].createdAt);
+        let newEndsAtIso: string | null = null;
+        if (body.votingDurationMs && body.votingDurationMs > 0) {
+          newEndsAtIso = new Date(roundStarted.getTime() + body.votingDurationMs).toISOString();
+        }
+        await db
+          .update(brackets)
+          .set({ roundEndsAt: newEndsAtIso })
+          .where(and(eq(brackets.watchPartyId, partyId), eq(brackets.round, currentRound)));
+
+        cancelParty(partyId);
+        if (newEndsAtIso) scheduleParty(partyId, new Date(newEndsAtIso), 'close');
+
+        broadcast(partyId, { type: 'round_deadline_changed' });
+      }
+    }
 
     broadcast(partyId, { type: 'party_updated' });
 
@@ -529,9 +596,15 @@ partiesRouter.openapi(
       } catch (e) {
         return c.json({ error: (e as Error).message }, 400);
       }
-      if (body.durationMs && body.durationMs > 0) {
-        await applyRoundDeadline(partyId, 1, body.durationMs);
+      // Body durationMs takes precedence; fall back to per-party votingDurationMs.
+      const effectiveDurationMs =
+        body.durationMs && body.durationMs > 0 ? body.durationMs : (party.votingDurationMs ?? 0);
+      if (effectiveDurationMs > 0) {
+        await applyRoundDeadline(partyId, 1, effectiveDurationMs);
       }
+      // Manual advance from planning stage: clear scheduled auto-advance.
+      cancelParty(partyId);
+      updates.votingStartsAt = null;
     }
 
     if (next === 'movie_selected') {

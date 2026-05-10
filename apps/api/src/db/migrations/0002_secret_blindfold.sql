@@ -1,0 +1,1 @@
+ALTER TABLE `watch_parties` ADD `voting_starts_at` text;

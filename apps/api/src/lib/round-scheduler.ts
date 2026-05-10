@@ -2,28 +2,35 @@ import { and, eq, isNotNull, isNull } from 'drizzle-orm';
 import { db } from '../db/client.js';
 import { brackets, watchParties } from '../db/schema.js';
 
-type CloseRoundFn = (partyId: string) => Promise<void>;
+export type ScheduledAction = 'close' | 'advance';
+
+type Handler = (partyId: string) => Promise<void>;
 
 const timers = new Map<string, NodeJS.Timeout>();
-let closeRoundImpl: CloseRoundFn | null = null;
+const handlers = new Map<ScheduledAction, Handler>();
 
-export function registerCloseRound(fn: CloseRoundFn) {
-  closeRoundImpl = fn;
+export function registerHandler(action: ScheduledAction, fn: Handler) {
+  handlers.set(action, fn);
 }
 
-export function scheduleAutoClose(partyId: string, deadline: Date) {
-  cancelAutoClose(partyId);
+// Backward-compat alias kept for existing callers.
+export function registerCloseRound(fn: Handler) {
+  registerHandler('close', fn);
+}
+
+export function scheduleParty(partyId: string, deadline: Date, action: ScheduledAction) {
+  cancelParty(partyId);
   const ms = Math.max(0, deadline.getTime() - Date.now());
   const timer = setTimeout(() => {
     timers.delete(partyId);
-    runAutoClose(partyId).catch((err) => {
-      console.error(`Auto-close failed for party ${partyId}:`, err);
+    runAction(partyId, action).catch((err) => {
+      console.error(`Scheduled ${action} failed for party ${partyId}:`, err);
     });
   }, ms);
   timers.set(partyId, timer);
 }
 
-export function cancelAutoClose(partyId: string) {
+export function cancelParty(partyId: string) {
   const timer = timers.get(partyId);
   if (timer) {
     clearTimeout(timer);
@@ -31,20 +38,33 @@ export function cancelAutoClose(partyId: string) {
   }
 }
 
-async function runAutoClose(partyId: string) {
-  if (!closeRoundImpl) {
-    console.warn(`Auto-close fired for ${partyId} but no closeRound impl is registered`);
+// Backward-compat aliases.
+export function scheduleAutoClose(partyId: string, deadline: Date) {
+  scheduleParty(partyId, deadline, 'close');
+}
+export function cancelAutoClose(partyId: string) {
+  cancelParty(partyId);
+}
+
+async function runAction(partyId: string, action: ScheduledAction) {
+  const fn = handlers.get(action);
+  if (!fn) {
+    console.warn(`No handler registered for action "${action}"`);
     return;
   }
   const party = await db.query.watchParties.findFirst({
     where: eq(watchParties.id, partyId),
   });
-  if (!party || party.status !== 'voting') return;
-  await closeRoundImpl(partyId);
+  if (!party) return;
+  // Action-specific status guards
+  if (action === 'close' && party.status !== 'voting') return;
+  if (action === 'advance' && party.status !== 'movie_suggestions_closed') return;
+  await fn(partyId);
 }
 
 export async function restoreSchedules() {
-  const rows = await db
+  // Close-round timers: unresolved brackets in voting parties with future roundEndsAt.
+  const closeRows = await db
     .select({ watchPartyId: brackets.watchPartyId, roundEndsAt: brackets.roundEndsAt })
     .from(brackets)
     .innerJoin(watchParties, eq(watchParties.id, brackets.watchPartyId))
@@ -56,21 +76,32 @@ export async function restoreSchedules() {
       ),
     );
 
-  const earliestPerParty = new Map<string, Date>();
-  for (const row of rows) {
+  const earliestClose = new Map<string, Date>();
+  for (const row of closeRows) {
     if (!row.roundEndsAt) continue;
-    const deadline = new Date(row.roundEndsAt);
-    const existing = earliestPerParty.get(row.watchPartyId);
-    if (!existing || deadline < existing) {
-      earliestPerParty.set(row.watchPartyId, deadline);
-    }
+    const d = new Date(row.roundEndsAt);
+    const existing = earliestClose.get(row.watchPartyId);
+    if (!existing || d < existing) earliestClose.set(row.watchPartyId, d);
+  }
+  for (const [partyId, deadline] of earliestClose) {
+    scheduleParty(partyId, deadline, 'close');
   }
 
-  for (const [partyId, deadline] of earliestPerParty) {
-    scheduleAutoClose(partyId, deadline);
+  // Advance timers: parties stuck in movie_suggestions_closed with a future votingStartsAt.
+  const advanceRows = await db
+    .select({ id: watchParties.id, votingStartsAt: watchParties.votingStartsAt })
+    .from(watchParties)
+    .where(
+      and(
+        eq(watchParties.status, 'movie_suggestions_closed'),
+        isNotNull(watchParties.votingStartsAt),
+      ),
+    );
+  for (const row of advanceRows) {
+    if (!row.votingStartsAt) continue;
+    scheduleParty(row.id, new Date(row.votingStartsAt), 'advance');
   }
 
-  if (earliestPerParty.size > 0) {
-    console.log(`Restored ${earliestPerParty.size} round timer(s).`);
-  }
+  const total = earliestClose.size + advanceRows.length;
+  if (total > 0) console.log(`Restored ${total} party timer(s).`);
 }

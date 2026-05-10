@@ -1,11 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { useMe } from '../hooks/useMe';
-import { api } from '../lib/api';
+import { api, type WatchParty } from '../lib/api';
 import { BracketRound } from './BracketRound';
-import { RoundDeadlinePicker } from './RoundDeadlinePicker';
+import { DurationPicker } from './DurationPicker';
 
-export function BracketView({ partyId }: { partyId: string }) {
+export function BracketView({ party }: { party: WatchParty }) {
+  const partyId = party.id;
   const { isHost } = useMe();
   const queryClient = useQueryClient();
 
@@ -23,18 +24,20 @@ export function BracketView({ partyId }: { partyId: string }) {
     },
   });
 
-  const setDeadlineMutation = useMutation({
-    mutationFn: (date: Date | null) =>
-      api.brackets.setRoundDeadline(partyId, date ? date.toISOString() : null),
+  const updateDurationMutation = useMutation({
+    mutationFn: (votingDurationMs: number | null) =>
+      api.parties.update(partyId, { votingDurationMs }),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['party', partyId] });
       queryClient.invalidateQueries({ queryKey: ['brackets', partyId] });
+      queryClient.invalidateQueries({ queryKey: ['parties'] });
     },
   });
 
   const currentRound = rounds.length > 0 ? Math.max(...rounds.map((r) => r.round)) : null;
-  const currentRoundData = currentRound != null ? rounds.find((r) => r.round === currentRound) : null;
+  const currentRoundData =
+    currentRound != null ? rounds.find((r) => r.round === currentRound) : null;
   const currentEndsAt = currentRoundData?.brackets.find((b) => b.roundEndsAt)?.roundEndsAt ?? null;
-  const currentDeadline = currentEndsAt ? new Date(currentEndsAt) : null;
 
   useEffect(() => {
     if (!currentEndsAt) return;
@@ -52,28 +55,9 @@ export function BracketView({ partyId }: { partyId: string }) {
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      {rounds.map(({ round, brackets, eligibleVoterCount }) => (
-        <BracketRound
-          key={round}
-          round={round}
-          brackets={brackets}
-          partyId={partyId}
-          isCurrentRound={round === currentRound}
-          eligibleVoterCount={eligibleVoterCount}
-        />
-      ))}
-
+    <div className="flex flex-col gap-4">
       {isHost && (
         <div className="flex flex-col gap-3">
-          <RoundDeadlinePicker
-            value={currentDeadline}
-            onChange={(date) => setDeadlineMutation.mutate(date)}
-            label="Round ends at"
-          />
-          {setDeadlineMutation.isPending && (
-            <p className="text-xs text-white/30">Saving deadline…</p>
-          )}
           <button
             onClick={() => {
               if (
@@ -89,12 +73,33 @@ export function BracketView({ partyId }: { partyId: string }) {
           >
             {closeRoundMutation.isPending ? 'Closing…' : 'Close round & advance'}
           </button>
+          <DurationPicker
+            value={party.votingDurationMs}
+            onChange={(votingDurationMs) => updateDurationMutation.mutate(votingDurationMs)}
+            label="Round duration"
+            helperText="Updates the current round's deadline and applies to future rounds."
+          />
+          {updateDurationMutation.isPending && (
+            <p className="text-xs text-white/30">Saving duration…</p>
+          )}
+          {closeRoundMutation.isError && (
+            <p className="text-xs text-red-400">{(closeRoundMutation.error as Error).message}</p>
+          )}
         </div>
       )}
 
-      {closeRoundMutation.isError && (
-        <p className="text-xs text-red-400">{(closeRoundMutation.error as Error).message}</p>
-      )}
+      {[...rounds]
+        .sort((a, b) => b.round - a.round)
+        .map(({ round, brackets, eligibleVoterCount }) => (
+          <BracketRound
+            key={round}
+            round={round}
+            brackets={brackets}
+            partyId={partyId}
+            isCurrentRound={round === currentRound}
+            eligibleVoterCount={eligibleVoterCount}
+          />
+        ))}
     </div>
   );
 }

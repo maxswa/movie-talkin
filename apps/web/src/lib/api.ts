@@ -59,6 +59,8 @@ export interface WatchParty {
   scheduledFor: string | null;
   selectedCategory: string | null;
   winningSuggestionId: string | null;
+  votingStartsAt: string | null;
+  votingDurationMs: number | null;
   createdAt: string;
 }
 
@@ -187,7 +189,14 @@ export const api = {
       request<WatchParty>(`/groups/${groupId}/parties`, { method: 'POST' }),
     delete: (partyId: string) =>
       request<{ ok: boolean }>(`/parties/${partyId}`, { method: 'DELETE' }),
-    update: (partyId: string, body: { scheduledFor?: string | null }) =>
+    update: (
+      partyId: string,
+      body: {
+        scheduledFor?: string | null;
+        votingStartsAt?: string | null;
+        votingDurationMs?: number | null;
+      },
+    ) =>
       request<WatchParty>(`/parties/${partyId}`, {
         method: 'PATCH',
         body: JSON.stringify(body),
@@ -250,11 +259,6 @@ export const api = {
       request<WatchParty>(`/parties/${partyId}/brackets/close-round`, {
         method: 'POST',
         body: JSON.stringify(body),
-      }),
-    setRoundDeadline: (partyId: string, endsAt: string | null) =>
-      request<{ ok: boolean }>(`/parties/${partyId}/round-deadline`, {
-        method: 'PATCH',
-        body: JSON.stringify({ endsAt }),
       }),
   },
 };

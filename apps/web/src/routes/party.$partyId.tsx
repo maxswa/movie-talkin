@@ -37,9 +37,8 @@ function PartyDetailPage() {
   const currentRoundNumber = rounds.length > 0 ? Math.max(...rounds.map((r) => r.round)) : null;
   const currentEndsAt =
     currentRoundNumber != null
-      ? rounds
-          .find((r) => r.round === currentRoundNumber)
-          ?.brackets.find((b) => b.roundEndsAt)?.roundEndsAt ?? null
+      ? (rounds.find((r) => r.round === currentRoundNumber)?.brackets.find((b) => b.roundEndsAt)
+          ?.roundEndsAt ?? null)
       : null;
 
   const deleteMutation = useMutation({
@@ -135,18 +134,15 @@ function PartyDetailPage() {
         {party.status === 'voting' && currentEndsAt && <RoundCountdown endsAt={currentEndsAt} />}
       </header>
 
-      {isHost && (
-        <section className="flex flex-col gap-3">
-          <h2 className="text-sm font-semibold text-white/60 uppercase tracking-wide">
-            Advance stage
-          </h2>
-          <AdvancePartyButton party={party} />
+      {isHost && <AdvancePartyButton party={party} />}
+
+      {party.status === 'voting' ? (
+        <PartyBody party={party} />
+      ) : (
+        <section className="rounded-2xl bg-surface p-5">
+          <PartyBody party={party} />
         </section>
       )}
-
-      <section className="rounded-2xl bg-surface p-5">
-        <PartyBody party={party} />
-      </section>
 
       {rounds.length > 0 && (
         <section className="flex flex-col gap-3">

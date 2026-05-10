@@ -55,6 +55,8 @@ export const watchParties = sqliteTable('watch_parties', {
   scheduledFor: text('scheduled_for'),
   selectedCategory: text('selected_category'),
   winningSuggestionId: text('winning_suggestion_id'),
+  votingStartsAt: text('voting_starts_at'),
+  votingDurationMs: integer('voting_duration_ms'),
   createdAt: now().notNull(),
 });
 

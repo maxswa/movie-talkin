@@ -6,7 +6,6 @@ import { generateMagicLink } from '../lib/magic-link.js';
 const HOST_NAME = process.env.SEED_HOST_NAME;
 const HOST_EMAIL = process.env.SEED_HOST_EMAIL;
 const GROUP_NAME = process.env.SEED_GROUP_NAME;
-const APP_URL = process.env.APP_URL ?? 'http://localhost:5173';
 
 if (!HOST_NAME || !GROUP_NAME) {
   console.error('Error: SEED_HOST_NAME and SEED_GROUP_NAME must be set in your .env');

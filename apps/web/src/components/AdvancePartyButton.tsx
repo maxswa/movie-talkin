@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, WatchParty } from '../lib/api';
 import { nextStatus } from '../lib/utils';
-import { STATUS_META } from './StatusBadge';
+import { STATUS_META } from '../lib/constants';
 
 export function AdvancePartyButton({ party }: { party: WatchParty }) {
   const queryClient = useQueryClient();

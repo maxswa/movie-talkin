@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { useState } from 'react';
 import { PartyCard } from '../components/PartyCard';
 import { PartyListItem } from '../components/PartyListItem';
 import { useMe } from '../hooks/useMe';
@@ -34,7 +35,9 @@ function Home() {
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
       .at(-1) ?? null;
 
-  const now = Date.now();
+  // Captured at mount; the parties query refetches via WS / focus, but the upcoming/past
+  // categorization staying stable for the session is fine.
+  const [now] = useState(() => Date.now());
 
   const upcomingParties = (parties ?? [])
     .filter(

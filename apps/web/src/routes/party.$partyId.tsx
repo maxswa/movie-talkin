@@ -8,11 +8,11 @@ import { MemberList } from '../components/MemberList';
 import { PartyBody } from '../components/PartyBody';
 import { RoundCountdown } from '../components/RoundCountdown';
 import { StatusBadge } from '../components/StatusBadge';
-import { STATUS_META } from '../components/StatusBadge';
 import { useMe } from '../hooks/useMe';
 import { usePartySocket } from '../hooks/usePartySocket';
 import { api, type WatchPartyDetail } from '../lib/api';
-import { formatDate, toLocalInputValue, WATCH_PARTY_STATUSES } from '../lib/utils';
+import { formatDate, toLocalInputValue } from '../lib/utils';
+import { WATCH_PARTY_STATUSES, STATUS_META } from '../lib/constants';
 
 export const Route = createFileRoute('/party/$partyId')({
   component: PartyDetailPage,

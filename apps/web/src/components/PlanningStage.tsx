@@ -2,8 +2,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useMe } from '../hooks/useMe';
 import { api, type WatchPartyDetail } from '../lib/api';
-import { toLocalInputValue } from '../lib/utils';
-import { DurationPicker, formatDuration } from './DurationPicker';
+import { formatDuration, toLocalInputValue } from '../lib/utils';
+import { DurationPicker } from './DurationPicker';
 import { MovieSuggestionItem } from './MovieSuggestionItem';
 
 export function PlanningStage({ party }: { party: WatchPartyDetail }) {

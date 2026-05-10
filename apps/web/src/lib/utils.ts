@@ -1,15 +1,5 @@
 import type { WatchPartyStatus } from './api';
-
-export const WATCH_PARTY_STATUSES: WatchPartyStatus[] = [
-  'draft',
-  'open_for_category_suggestions',
-  'category_suggestions_closed',
-  'open_for_movie_suggestions',
-  'movie_suggestions_closed',
-  'voting',
-  'movie_selected',
-  'watched',
-];
+import { DURATION_PRESETS, WATCH_PARTY_STATUSES } from './constants';
 
 export function nextStatus(current: WatchPartyStatus): WatchPartyStatus | null {
   const idx = WATCH_PARTY_STATUSES.indexOf(current);
@@ -32,4 +22,16 @@ export function formatDate(iso: string) {
     hour: 'numeric',
     minute: '2-digit',
   }).format(new Date(iso));
+}
+
+export function formatDuration(ms: number | null): string | null {
+  if (!ms || ms <= 0) return null;
+  const preset = DURATION_PRESETS.find((p) => p.value === ms);
+  if (preset) return preset.label;
+  const totalSec = Math.round(ms / 1000);
+  if (totalSec < 60) return `${totalSec}s`;
+  const totalMin = Math.round(totalSec / 60);
+  if (totalMin < 60) return `${totalMin} min`;
+  const hours = Math.round(totalMin / 60);
+  return `${hours} hr`;
 }

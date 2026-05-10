@@ -1,6 +1,6 @@
-import { useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useMe } from '../hooks/useMe';
 import { api } from '../lib/api';
 
@@ -16,10 +16,17 @@ function VerifyPage() {
   const queryClient = useQueryClient();
   const { token } = Route.useSearch();
   const { isAuthenticated, isLoading: meLoading } = useMe();
-  const [error, setError] = useState<string | null>(null);
+
+  const { mutate, isIdle, error } = useMutation({
+    mutationFn: (t: string) => api.auth.verify(t),
+    onSuccess: () => {
+      queryClient.resetQueries({ queryKey: ['me'] });
+      queryClient.resetQueries({ queryKey: ['groups'] });
+      navigate({ to: '/', replace: true });
+    },
+  });
 
   useEffect(() => {
-    // Wait for the initial auth check before deciding what to do.
     if (meLoading) return;
 
     // Already signed in (e.g. they tapped an old magic link in their messages).
@@ -29,25 +36,16 @@ function VerifyPage() {
       return;
     }
 
-    if (!token) {
-      setError('No token provided.');
-      return;
-    }
+    if (token && isIdle) mutate(token);
+  }, [token, isAuthenticated, meLoading, isIdle, mutate, navigate]);
 
-    api.auth
-      .verify(token)
-      .then(() => {
-        queryClient.resetQueries({ queryKey: ['me'] });
-        queryClient.resetQueries({ queryKey: ['groups'] });
-        navigate({ to: '/', replace: true });
-      })
-      .catch((e: Error) => setError(e.message));
-  }, [token, isAuthenticated, meLoading, navigate, queryClient]);
+  const errorMessage =
+    error?.message ?? (!meLoading && !isAuthenticated && !token ? 'No token provided.' : null);
 
-  if (error) {
+  if (errorMessage) {
     return (
       <div className="flex flex-col items-center gap-4 pt-16 text-center">
-        <p className="text-red-400 text-lg">{error}</p>
+        <p className="text-red-400 text-lg">{errorMessage}</p>
         <p className="text-gray-500 text-sm">
           Your link may have expired. Ask the host for a new one.
         </p>

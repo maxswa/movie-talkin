@@ -12,3 +12,9 @@
 body {
   background-color: #2a2b35;
 }
+
+@keyframes bracket-spinner {
+  to {
+    stroke-dashoffset: -100;
+  }
+}

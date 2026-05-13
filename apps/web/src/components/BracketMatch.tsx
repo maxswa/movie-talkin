@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useMe } from '../hooks/useMe';
-import { api, tmdbImageUrl, type Bracket } from '../lib/api';
+import { api, tmdbImageUrl, type Bracket, type BracketRound } from '../lib/api';
 import { BracketMovieOption } from './BracketMovieOption';
 import { BracketVoteBreakdown } from './BracketVoteBreakdown';
 
@@ -20,8 +20,29 @@ export function BracketMatch({ bracket, partyId, roundClosed, eligibleVoterCount
 
   const mutation = useMutation({
     mutationFn: (suggestionId: string) => api.brackets.vote(bracket.id, suggestionId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['brackets', partyId] });
+    onSuccess: (_data, suggestionId) => {
+      queryClient.setQueryData<BracketRound[]>(['brackets', partyId], (rounds) => {
+        if (!rounds) return rounds;
+        return rounds.map((round) => ({
+          ...round,
+          brackets: round.brackets.map((b) => {
+            if (b.id !== bracket.id) return b;
+            const prev = b.myVote;
+            let { voteCountA, voteCountB, voterCount } = b;
+            if (prev === null) {
+              voterCount += 1;
+              if (suggestionId === b.suggestionA.id) voteCountA += 1;
+              else if (suggestionId === b.suggestionB.id) voteCountB += 1;
+            } else if (prev !== suggestionId) {
+              if (prev === b.suggestionA.id) voteCountA -= 1;
+              else if (prev === b.suggestionB.id) voteCountB -= 1;
+              if (suggestionId === b.suggestionA.id) voteCountA += 1;
+              else if (suggestionId === b.suggestionB.id) voteCountB += 1;
+            }
+            return { ...b, myVote: suggestionId, voteCountA, voteCountB, voterCount };
+          }),
+        }));
+      });
     },
   });
 
@@ -57,6 +78,7 @@ export function BracketMatch({ bracket, partyId, roundClosed, eligibleVoterCount
           showCount={roundClosed}
           onClick={() => mutation.mutate(bracket.suggestionA.id)}
           disabled={roundClosed || mutation.isPending}
+          isPending={mutation.isPending && mutation.variables === bracket.suggestionA.id}
         />
         <div className="flex items-center text-white/20 text-xs font-medium shrink-0 self-center">
           VS
@@ -69,6 +91,7 @@ export function BracketMatch({ bracket, partyId, roundClosed, eligibleVoterCount
           showCount={roundClosed}
           onClick={() => mutation.mutate(bracket.suggestionB.id)}
           disabled={roundClosed || mutation.isPending}
+          isPending={mutation.isPending && mutation.variables === bracket.suggestionB.id}
         />
       </div>
       {showCounter && (

@@ -8,6 +8,7 @@ interface Props {
   showCount: boolean;
   onClick?: () => void;
   disabled?: boolean;
+  isPending?: boolean;
 }
 
 export function BracketMovieOption({
@@ -18,6 +19,7 @@ export function BracketMovieOption({
   showCount,
   onClick,
   disabled,
+  isPending,
 }: Props) {
   const poster = tmdbImageUrl(suggestion.posterPath, 'w185');
 
@@ -33,6 +35,28 @@ export function BracketMovieOption({
             : 'bg-white/5 hover:bg-white/10'
       }`}
     >
+      {isPending && (
+        <svg
+          aria-hidden="true"
+          fill="none"
+          className="pointer-events-none absolute inset-0 h-full w-full overflow-visible"
+        >
+          <rect
+            x="0"
+            y="0"
+            width="100%"
+            height="100%"
+            rx="12"
+            ry="12"
+            stroke="var(--color-accent-purple)"
+            strokeWidth="3"
+            strokeLinecap="round"
+            pathLength="100"
+            strokeDasharray="30 70"
+            style={{ animation: 'bracket-spinner 1s linear infinite' }}
+          />
+        </svg>
+      )}
       {isVoted && !isWinner && (
         <span className="absolute top-1.5 right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-accent-purple text-xs font-bold text-white shadow">
           ✓

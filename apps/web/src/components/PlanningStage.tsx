@@ -48,7 +48,7 @@ export function PlanningStage({ party }: { party: WatchPartyDetail }) {
     if (isNaN(date.getTime())) return;
     updateMutation.mutate({ votingStartsAt: date.toISOString() });
   }
-  console.log({ duration: party.votingDurationMs });
+
   return (
     <div className="flex flex-col gap-4">
       {isHost ? (

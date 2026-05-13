@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createFileRoute, useRouter } from '@tanstack/react-router';
+import { useState } from 'react';
 import { AdvancePartyButton } from '../components/AdvancePartyButton';
 import { BracketBreakdowns } from '../components/BracketBreakdowns';
 import { BracketTree } from '../components/BracketTree';
@@ -7,6 +8,7 @@ import { CategoryHistory } from '../components/CategoryHistory';
 import { MemberList } from '../components/MemberList';
 import { PartyBody } from '../components/PartyBody';
 import { RoundCountdown } from '../components/RoundCountdown';
+import { SortButton } from '../components/SortButton';
 import { StatusBadge } from '../components/StatusBadge';
 import { useMe } from '../hooks/useMe';
 import { usePartySocket } from '../hooks/usePartySocket';
@@ -23,6 +25,7 @@ function PartyDetailPage() {
   const { isHost } = useMe();
   const router = useRouter();
   const queryClient = useQueryClient();
+  const [memberSort, setMemberSort] = useState<'name' | 'joined'>('name');
   usePartySocket(partyId);
 
   const { data: party, isLoading } = useQuery({
@@ -173,8 +176,24 @@ function PartyDetailPage() {
 
       {isHost && (
         <section className="flex flex-col gap-3">
-          <h2 className="text-sm font-semibold text-white/60 uppercase tracking-wide">Members</h2>
-          <MemberList members={party.members} />
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-white/60 uppercase tracking-wide">Members</h2>
+            <div className="flex items-center gap-0.5 rounded-full bg-white/5 p-0.5 text-xs">
+              <SortButton active={memberSort === 'name'} onClick={() => setMemberSort('name')}>
+                Name
+              </SortButton>
+              <SortButton active={memberSort === 'joined'} onClick={() => setMemberSort('joined')}>
+                Joined
+              </SortButton>
+            </div>
+          </div>
+          <MemberList
+            members={[...party.members].sort((a, b) =>
+              memberSort === 'name'
+                ? a.name.localeCompare(b.name)
+                : b.joinedAt.localeCompare(a.joinedAt),
+            )}
+          />
         </section>
       )}
 

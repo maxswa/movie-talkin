@@ -154,7 +154,12 @@ function PartyDetailPage() {
       {rounds.length > 0 && (
         <section className="flex flex-col gap-3">
           <h2 className="text-sm font-semibold text-white/60 uppercase tracking-wide">Bracket</h2>
-          <BracketTree rounds={rounds} />
+          <BracketTree
+            rounds={rounds}
+            revealSuggesters={
+              isHost || party.status === 'movie_selected' || party.status === 'watched'
+            }
+          />
         </section>
       )}
 

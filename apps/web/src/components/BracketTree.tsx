@@ -1,6 +1,11 @@
 import { tmdbImageUrl, type Bracket, type BracketRound } from '../lib/api';
 
-export function BracketTree({ rounds }: { rounds: BracketRound[] }) {
+interface Props {
+  rounds: BracketRound[];
+  revealSuggesters: boolean;
+}
+
+export function BracketTree({ rounds, revealSuggesters }: Props) {
   if (rounds.length === 0) return null;
 
   const finalRound = Math.max(...rounds.map((r) => r.round));
@@ -15,7 +20,7 @@ export function BracketTree({ rounds }: { rounds: BracketRound[] }) {
             </p>
             <div className="flex flex-col flex-1 justify-around gap-3">
               {brackets.map((b) => (
-                <TreeMatch key={b.id} bracket={b} />
+                <TreeMatch key={b.id} bracket={b} revealSuggesters={revealSuggesters} />
               ))}
             </div>
           </div>
@@ -25,7 +30,7 @@ export function BracketTree({ rounds }: { rounds: BracketRound[] }) {
   );
 }
 
-function TreeMatch({ bracket }: { bracket: Bracket }) {
+function TreeMatch({ bracket, revealSuggesters }: { bracket: Bracket; revealSuggesters: boolean }) {
   const isBye = bracket.suggestionA.id === bracket.suggestionB.id;
   const resolved = bracket.winnerId !== null;
   const showCount = resolved && !isBye;
@@ -38,7 +43,7 @@ function TreeMatch({ bracket }: { bracket: Bracket }) {
           isWinner={true}
           voteCount={null}
           showCount={false}
-          showSuggester={true}
+          showSuggester={revealSuggesters}
         />
         <p className="text-[10px] text-white/45 text-center pt-1">bye</p>
       </div>
@@ -53,7 +58,7 @@ function TreeMatch({ bracket }: { bracket: Bracket }) {
         isLoser={bracket.winnerId === bracket.suggestionB.id}
         voteCount={bracket.voteCountA}
         showCount={showCount}
-        showSuggester={resolved}
+        showSuggester={resolved && revealSuggesters}
       />
       <TreeOption
         suggestion={bracket.suggestionB}
@@ -61,7 +66,7 @@ function TreeMatch({ bracket }: { bracket: Bracket }) {
         isLoser={bracket.winnerId === bracket.suggestionA.id}
         voteCount={bracket.voteCountB}
         showCount={showCount}
-        showSuggester={resolved}
+        showSuggester={resolved && revealSuggesters}
       />
     </div>
   );

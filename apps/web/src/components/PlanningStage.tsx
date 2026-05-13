@@ -38,7 +38,7 @@ export function PlanningStage({ party }: { party: WatchPartyDetail }) {
     },
   });
 
-  function handleStartsAtChange(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleStartsAtBlur(e: React.FocusEvent<HTMLInputElement>) {
     const value = e.target.value;
     if (!value) {
       updateMutation.mutate({ votingStartsAt: null });
@@ -59,7 +59,7 @@ export function PlanningStage({ party }: { party: WatchPartyDetail }) {
               key={party.votingStartsAt ?? 'empty'}
               type="datetime-local"
               defaultValue={toLocalInputValue(party.votingStartsAt)}
-              onChange={handleStartsAtChange}
+              onBlur={handleStartsAtBlur}
               className="rounded-xl bg-white/10 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-accent-purple/50 [color-scheme:dark]"
             />
             <span className="text-[11px] text-white/60">

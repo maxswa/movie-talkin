@@ -83,7 +83,7 @@ function PartyDetailPage() {
     },
   });
 
-  function handleDateChange(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleDateBlur(e: React.FocusEvent<HTMLInputElement>) {
     const value = e.target.value;
     if (!value) {
       updateMutation.mutate(null);
@@ -133,7 +133,7 @@ function PartyDetailPage() {
             key={party.scheduledFor ?? 'empty'}
             type="datetime-local"
             defaultValue={toLocalInputValue(party.scheduledFor)}
-            onChange={handleDateChange}
+            onBlur={handleDateBlur}
             className="rounded-xl bg-white/10 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-accent-purple/50 [color-scheme:dark]"
           />
         ) : (

@@ -15,7 +15,7 @@
     "db:seed": "pnpm --filter @movie-talkin/api db:seed",
     "db:fixture": "pnpm --filter @movie-talkin/api db:fixture",
     "db:studio": "pnpm --filter @movie-talkin/api db:studio",
-    "prepare": "husky"
+    "prepare": "husky || true"
   },
   "lint-staged": {
     "*.{ts,tsx,json,css,md}": "prettier --write",

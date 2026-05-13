@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef, useState } from 'react';
 import { tmdbImageUrl, type MovieSuggestion } from '../lib/api';
 
 interface Props {
@@ -9,7 +10,17 @@ interface Props {
   onClick?: () => void;
   disabled?: boolean;
   isPending?: boolean;
+  onSpinnerDone?: () => void;
 }
+
+type Phase = 'idle' | 'loading' | 'finishing';
+
+const SPINNER_DASH = 30;
+const SPINNER_DURATION_MS = 1000;
+// The head accelerates while closing on the tail so the loop completes snappily.
+const FINISH_SPEED_MULTIPLIER = 2;
+const FINISH_DURATION_MS =
+  (SPINNER_DURATION_MS * ((100 - SPINNER_DASH) / 100)) / FINISH_SPEED_MULTIPLIER;
 
 export function BracketMovieOption({
   suggestion,
@@ -20,8 +31,39 @@ export function BracketMovieOption({
   onClick,
   disabled,
   isPending,
+  onSpinnerDone,
 }: Props) {
   const poster = tmdbImageUrl(suggestion.posterPath, 'w185');
+  const rectRef = useRef<SVGRectElement | null>(null);
+  const [phase, setPhase] = useState<Phase>('idle');
+  const [frozenOffset, setFrozenOffset] = useState<string | null>(null);
+
+  // Reading the live animation value out of the DOM requires a layout effect;
+  // there's no way to derive the current stroke-dashoffset from React state.
+  /* eslint-disable react-hooks/set-state-in-effect */
+  useLayoutEffect(() => {
+    if (isPending && phase === 'idle') {
+      setPhase('loading');
+    } else if (!isPending && phase === 'loading') {
+      // Snapshot the tail position before swapping animations so the tail
+      // stays anchored while the head closes the loop.
+      const rect = rectRef.current;
+      if (rect) {
+        setFrozenOffset(window.getComputedStyle(rect).strokeDashoffset);
+      }
+      setPhase('finishing');
+    }
+  }, [isPending, phase]);
+  /* eslint-enable react-hooks/set-state-in-effect */
+
+  function handleAnimationEnd() {
+    if (phase !== 'finishing') return;
+    setPhase('idle');
+    setFrozenOffset(null);
+    onSpinnerDone?.();
+  }
+
+  const showSpinner = phase !== 'idle';
 
   return (
     <button
@@ -35,13 +77,14 @@ export function BracketMovieOption({
             : 'bg-white/5 hover:bg-white/10'
       }`}
     >
-      {isPending && (
+      {showSpinner && (
         <svg
           aria-hidden="true"
           fill="none"
           className="pointer-events-none absolute inset-0 h-full w-full overflow-visible"
         >
           <rect
+            ref={rectRef}
             x="0"
             y="0"
             width="100%"
@@ -52,8 +95,15 @@ export function BracketMovieOption({
             strokeWidth="3"
             strokeLinecap="round"
             pathLength="100"
-            strokeDasharray="30 70"
-            style={{ animation: 'bracket-spinner 1s linear infinite' }}
+            strokeDasharray={`${SPINNER_DASH} ${100 - SPINNER_DASH}`}
+            style={{
+              animation:
+                phase === 'loading'
+                  ? `bracket-spinner ${SPINNER_DURATION_MS}ms linear infinite`
+                  : `bracket-spinner-finish ${FINISH_DURATION_MS}ms linear forwards`,
+              ...(frozenOffset !== null ? { strokeDashoffset: frozenOffset } : {}),
+            }}
+            onAnimationEnd={handleAnimationEnd}
           />
         </svg>
       )}

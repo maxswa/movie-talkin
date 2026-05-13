@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
 import { useMe } from '../hooks/useMe';
 import { api, tmdbImageUrl, type Bracket, type BracketRound } from '../lib/api';
 import { BracketMovieOption } from './BracketMovieOption';
@@ -17,6 +18,8 @@ export function BracketMatch({ bracket, partyId, roundClosed, eligibleVoterCount
   const isBye = bracket.suggestionA.id === bracket.suggestionB.id;
   const showBreakdown = isHost && !isBye;
   const showCounter = !isBye && bracket.winnerId === null;
+
+  const [windDownId, setWindDownId] = useState<string | null>(null);
 
   const mutation = useMutation({
     mutationFn: (suggestionId: string) => api.brackets.vote(bracket.id, suggestionId),
@@ -43,8 +46,21 @@ export function BracketMatch({ bracket, partyId, roundClosed, eligibleVoterCount
           }),
         }));
       });
+      // Suppress the voted style until BracketMovieOption finishes its
+      // close-the-loop animation and reports back via onSpinnerDone.
+      setWindDownId(suggestionId);
     },
   });
+
+  function handleSpinnerDone(id: string) {
+    if (windDownId === id) setWindDownId(null);
+  }
+
+  const aIsWindingDown = windDownId === bracket.suggestionA.id;
+  const bIsWindingDown = windDownId === bracket.suggestionB.id;
+  const aIsPending = mutation.isPending && mutation.variables === bracket.suggestionA.id;
+  const bIsPending = mutation.isPending && mutation.variables === bracket.suggestionB.id;
+  const isBusy = mutation.isPending || windDownId !== null;
 
   if (isBye) {
     const poster = tmdbImageUrl(bracket.suggestionA.posterPath, 'w92');
@@ -72,26 +88,28 @@ export function BracketMatch({ bracket, partyId, roundClosed, eligibleVoterCount
       <div className="flex items-stretch gap-2">
         <BracketMovieOption
           suggestion={bracket.suggestionA}
-          isVoted={bracket.myVote === bracket.suggestionA.id}
+          isVoted={bracket.myVote === bracket.suggestionA.id && !aIsWindingDown}
           isWinner={bracket.winnerId === bracket.suggestionA.id}
           voteCount={bracket.voteCountA}
           showCount={roundClosed}
           onClick={() => mutation.mutate(bracket.suggestionA.id)}
-          disabled={roundClosed || mutation.isPending}
-          isPending={mutation.isPending && mutation.variables === bracket.suggestionA.id}
+          disabled={roundClosed || isBusy}
+          isPending={aIsPending}
+          onSpinnerDone={() => handleSpinnerDone(bracket.suggestionA.id)}
         />
         <div className="flex items-center text-white/20 text-xs font-medium shrink-0 self-center">
           VS
         </div>
         <BracketMovieOption
           suggestion={bracket.suggestionB}
-          isVoted={bracket.myVote === bracket.suggestionB.id}
+          isVoted={bracket.myVote === bracket.suggestionB.id && !bIsWindingDown}
           isWinner={bracket.winnerId === bracket.suggestionB.id}
           voteCount={bracket.voteCountB}
           showCount={roundClosed}
           onClick={() => mutation.mutate(bracket.suggestionB.id)}
-          disabled={roundClosed || mutation.isPending}
-          isPending={mutation.isPending && mutation.variables === bracket.suggestionB.id}
+          disabled={roundClosed || isBusy}
+          isPending={bIsPending}
+          onSpinnerDone={() => handleSpinnerDone(bracket.suggestionB.id)}
         />
       </div>
       {showCounter && (

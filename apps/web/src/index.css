@@ -18,3 +18,12 @@ body {
     stroke-dashoffset: -100;
   }
 }
+
+@keyframes bracket-spinner-finish {
+  from {
+    stroke-dasharray: 30 70;
+  }
+  to {
+    stroke-dasharray: 100 0;
+  }
+}

@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import confetti from 'canvas-confetti';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { CategorySpinPayload } from '../lib/api';
 
 const SEGMENT_COLORS = [
@@ -31,34 +31,66 @@ function fireConfetti() {
   );
 }
 
-export function CategorySpinner({ partyId, spin }: { partyId: string; spin: CategorySpinPayload }) {
+export function CategorySpinner({
+  partyId,
+  spin,
+  replayable,
+}: {
+  partyId: string;
+  spin: CategorySpinPayload;
+  replayable?: boolean;
+}) {
   const queryClient = useQueryClient();
-  const [rotation, setRotation] = useState(0);
-  const [landed, setLanded] = useState(false);
-
   const { winner, suggestions } = spin;
   const segAngle = 360 / suggestions.length;
   const winnerIndex = suggestions.findIndex((s) => s.id === winner.id);
+  const target = winnerIndex < 0 ? 0 : 360 * 5 - (winnerIndex + 0.5) * segAngle;
+
+  // In replayable mode, jump straight to the landed state — the spin already
+  // happened, this view is just commemorating the result.
+  const [rotation, setRotation] = useState(replayable ? target : 0);
+  const [landed, setLanded] = useState(!!replayable);
+  const timersRef = useRef<number[]>([]);
+
+  const clearTimers = useCallback(() => {
+    for (const t of timersRef.current) window.clearTimeout(t);
+    timersRef.current = [];
+  }, []);
+
+  // Schedules the rotation/landing animation. No synchronous state mutation, so
+  // it's safe to call from an effect — the actual setState calls happen inside
+  // the timer callbacks.
+  const scheduleSpin = useCallback(() => {
+    if (winnerIndex < 0) return;
+    clearTimers();
+    timersRef.current.push(
+      window.setTimeout(() => setRotation(target), 50),
+      window.setTimeout(() => {
+        setLanded(true);
+        fireConfetti();
+      }, SPIN_DURATION_MS + 50),
+    );
+    if (!replayable) {
+      timersRef.current.push(
+        window.setTimeout(() => {
+          queryClient.removeQueries({ queryKey: ['category-spin', partyId] });
+          queryClient.invalidateQueries({ queryKey: ['party', partyId] });
+          queryClient.invalidateQueries({ queryKey: ['parties'] });
+        }, SPIN_DURATION_MS + POST_SPIN_PAUSE_MS),
+      );
+    }
+  }, [clearTimers, partyId, queryClient, replayable, target, winnerIndex]);
+
+  function handleReplay() {
+    setRotation(0);
+    setLanded(false);
+    scheduleSpin();
+  }
 
   useEffect(() => {
-    if (winnerIndex < 0) return;
-    const target = 360 * 5 - (winnerIndex + 0.5) * segAngle;
-    const startId = window.setTimeout(() => setRotation(target), 50);
-    const landId = window.setTimeout(() => {
-      setLanded(true);
-      fireConfetti();
-    }, SPIN_DURATION_MS + 50);
-    const cleanupId = window.setTimeout(() => {
-      queryClient.removeQueries({ queryKey: ['category-spin', partyId] });
-      queryClient.invalidateQueries({ queryKey: ['party', partyId] });
-      queryClient.invalidateQueries({ queryKey: ['parties'] });
-    }, SPIN_DURATION_MS + POST_SPIN_PAUSE_MS);
-    return () => {
-      window.clearTimeout(startId);
-      window.clearTimeout(landId);
-      window.clearTimeout(cleanupId);
-    };
-  }, [partyId, winnerIndex, segAngle, queryClient]);
+    if (!replayable) scheduleSpin();
+    return clearTimers;
+  }, [clearTimers, replayable, scheduleSpin]);
 
   return (
     <div className="flex flex-col items-center gap-4 py-2">
@@ -98,6 +130,14 @@ export function CategorySpinner({ partyId, spin }: { partyId: string; spin: Cate
         />
       </div>
       {landed && <p className="text-lg font-semibold text-white animate-pulse">{winner.name}</p>}
+      {replayable && landed && (
+        <button
+          onClick={handleReplay}
+          className="rounded-full bg-white/10 hover:bg-white/20 px-4 py-1.5 text-xs font-medium text-white transition-colors"
+        >
+          Replay
+        </button>
+      )}
     </div>
   );
 }

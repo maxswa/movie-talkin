@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { tmdbImageUrl, type CategorySpinPayload, type WatchPartyDetail } from '../lib/api';
+import { api, tmdbImageUrl, type CategorySpinPayload, type WatchPartyDetail } from '../lib/api';
 import { BracketView } from './BracketView';
 import { CategorySpinner } from './CategorySpinner';
 import { CategorySuggestions } from './CategorySuggestions';
@@ -13,6 +13,12 @@ export function PartyBody({ party }: { party: WatchPartyDetail }) {
     queryFn: () => null,
     enabled: false,
     staleTime: Infinity,
+  });
+
+  const { data: categorySuggestions = [] } = useQuery({
+    queryKey: ['category-suggestions', party.id],
+    queryFn: () => api.categorySuggestions.list(party.id),
+    enabled: party.status === 'category_suggestions_closed' && !spin,
   });
 
   if (spin) {
@@ -30,16 +36,16 @@ export function PartyBody({ party }: { party: WatchPartyDetail }) {
     case 'open_for_category_suggestions':
       return <CategorySuggestions partyId={party.id} />;
 
-    case 'category_suggestions_closed':
-      return (
-        <div className="flex flex-col items-center gap-3 py-6 rounded-2xl bg-surface">
-          <p className="text-white/60 text-xs uppercase tracking-widest">Category</p>
-          <span className="rounded-full bg-accent-purple/20 text-accent-purple px-5 py-2 text-sm font-medium">
-            {party.selectedCategory}
-          </span>
-          <p className="text-white/60 text-sm mt-1">Movie suggestions opening soon…</p>
-        </div>
-      );
+    case 'category_suggestions_closed': {
+      const winnerSuggestion = categorySuggestions.find((s) => s.name === party.selectedCategory);
+      if (!winnerSuggestion || categorySuggestions.length === 0) return null;
+      const replayPayload: CategorySpinPayload = {
+        type: 'category_spin',
+        winner: { id: winnerSuggestion.id, name: winnerSuggestion.name },
+        suggestions: categorySuggestions.map((s) => ({ id: s.id, name: s.name })),
+      };
+      return <CategorySpinner partyId={party.id} spin={replayPayload} replayable />;
+    }
 
     case 'open_for_movie_suggestions':
       return <MovieSuggestions partyId={party.id} />;

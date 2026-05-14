@@ -29,6 +29,13 @@
       "when": 1778375299698,
       "tag": "0003_greedy_scarlet_spider",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1778785021381,
+      "tag": "0004_dark_hitman",
+      "breakpoints": true
     }
   ]
 }

@@ -14,13 +14,16 @@ primary_region = 'iad'
 [env]
   PORT = '3000'
   STATIC_ROOT = 'apps/web/dist'
+  # Embedded replica: local SQLite file synced from Turso (DB_URL secret).
+  # Reads hit this file (sub-ms); writes commit to Turso and sync back.
+  LOCAL_DB_URL = 'file:./replica.db'
 
 [http_service]
   internal_port = 3000
   force_https = true
   auto_stop_machines = 'stop'
   auto_start_machines = true
-  min_machines_running = 0
+  min_machines_running = 1
   processes = ['app']
 
 [[vm]]

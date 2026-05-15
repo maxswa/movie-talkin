@@ -93,7 +93,7 @@ export function BracketMatch({ bracket, partyId, roundClosed, eligibleVoterCount
           voteCount={bracket.voteCountA}
           showCount={roundClosed}
           onClick={() => mutation.mutate(bracket.suggestionA.id)}
-          disabled={roundClosed || isBusy}
+          disabled={roundClosed || isBusy || bracket.myVote === bracket.suggestionA.id}
           isPending={aIsPending}
           onSpinnerDone={() => handleSpinnerDone(bracket.suggestionA.id)}
         />
@@ -107,7 +107,7 @@ export function BracketMatch({ bracket, partyId, roundClosed, eligibleVoterCount
           voteCount={bracket.voteCountB}
           showCount={roundClosed}
           onClick={() => mutation.mutate(bracket.suggestionB.id)}
-          disabled={roundClosed || isBusy}
+          disabled={roundClosed || isBusy || bracket.myVote === bracket.suggestionB.id}
           isPending={bIsPending}
           onSpinnerDone={() => handleSpinnerDone(bracket.suggestionB.id)}
         />

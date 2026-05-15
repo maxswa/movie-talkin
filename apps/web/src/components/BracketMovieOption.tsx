@@ -71,7 +71,9 @@ export function BracketMovieOption({
       disabled={disabled}
       className={`relative flex-1 flex flex-col items-center gap-2 rounded-xl p-3 transition-all disabled:cursor-default ${
         isWinner
-          ? 'bg-green-500/10 ring-1 ring-green-500/30'
+          ? isVoted
+            ? 'bg-green-500/15 ring-2 ring-green-500/60'
+            : 'bg-green-500/10 ring-1 ring-green-500/30'
           : isVoted
             ? 'bg-accent-purple/30 ring-2 ring-accent-purple shadow-lg shadow-accent-purple/40'
             : 'bg-white/5 hover:bg-white/10'
@@ -107,8 +109,12 @@ export function BracketMovieOption({
           />
         </svg>
       )}
-      {isVoted && !isWinner && (
-        <span className="absolute top-1.5 right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-accent-purple text-xs font-bold text-white shadow">
+      {isVoted && (
+        <span
+          className={`absolute top-1.5 right-1.5 flex h-5 w-5 items-center justify-center rounded-full text-xs font-bold text-white shadow ${
+            isWinner ? 'bg-green-500' : 'bg-accent-purple'
+          }`}
+        >
           ✓
         </span>
       )}

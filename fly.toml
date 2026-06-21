@@ -26,6 +26,16 @@ primary_region = 'iad'
   min_machines_running = 1
   processes = ['app']
 
+  # /health issues a real DB write through the embedded-replica path. When the
+  # remote sync wedges (reads still work, writes hang), this returns 503 so
+  # Fly stops routing here and restarts the machine.
+  [[http_service.checks]]
+    method = 'GET'
+    path = '/health'
+    interval = '30s'
+    timeout = '10s'
+    grace_period = '30s'
+
 [[vm]]
   cpu_kind = 'shared'
   cpus = 1

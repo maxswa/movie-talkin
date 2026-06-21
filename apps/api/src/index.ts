@@ -7,6 +7,7 @@ import { logger } from 'hono/logger';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { WebSocketServer } from 'ws';
+import { probeWrite } from './db/client.js';
 import { subscribe } from './lib/pubsub.js';
 import { restoreSchedules } from './lib/round-scheduler.js';
 import { authRouter } from './routes/auth.js';
@@ -33,7 +34,15 @@ app.onError((err, c) => {
   return c.json({ error: err.message }, 500);
 });
 
-app.get('/health', (c) => c.json({ ok: true }));
+app.get('/health', async (c) => {
+  try {
+    await probeWrite();
+    return c.json({ ok: true });
+  } catch (err) {
+    console.error('[health] write probe failed:', err);
+    return c.json({ ok: false, error: err instanceof Error ? err.message : String(err) }, 503);
+  }
+});
 
 app.get(
   '/ws/parties/:partyId',

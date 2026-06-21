@@ -1,4 +1,5 @@
 import { createClient } from '@libsql/client';
+import { sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/libsql';
 import * as schema from './schema.js';
 
@@ -10,14 +11,33 @@ const authToken = process.env.DB_AUTH_TOKEN;
 // local SQLite file, while writes commit to the remote and stream back.
 // Otherwise we talk directly to whatever DB_URL points at (local dev: a file;
 // migrations: Turso).
+// Run our own sync loop instead of the client's `syncInterval` so errors
+// surface — the built-in timer swallows them, which is how we end up wedged
+// without warning.
 const client = localUrl
-  ? createClient({ url: localUrl, syncUrl: remoteUrl, authToken, syncInterval: 30 })
+  ? createClient({ url: localUrl, syncUrl: remoteUrl, authToken })
   : createClient({ url: remoteUrl, authToken });
 
-// Pull the latest state once at boot so queries don't race the first
-// background sync. Skipped when there's no syncUrl to pull from.
 if (localUrl) {
-  await client.sync();
+  try {
+    await client.sync();
+  } catch (err) {
+    console.error('[db] initial sync failed:', err);
+    throw err;
+  }
+
+  setInterval(() => {
+    client.sync().catch((err) => {
+      console.error('[db] background sync failed:', err);
+    });
+  }, 30_000).unref();
 }
 
 export const db = drizzle(client, { schema });
+
+// Issues a zero-row UPDATE so libsql routes it through the embedded-replica
+// write path (local → remote primary → ack). Exercises the exact connection
+// that wedges while reads keep serving from the local file.
+export async function probeWrite(): Promise<void> {
+  await db.run(sql`UPDATE users SET name = name WHERE 1 = 0`);
+}
